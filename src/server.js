@@ -31,7 +31,8 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 
-process.on("uncaughtException", () => {
+process.on("uncaughtException", (err) => {
+  console.log(err);
   console.log(`😈 server is closed by uncaughtException error,`);
   errorLoger.error(`😈 server is closed by uncaughtException error,`);
   process.exit(1);
