@@ -1,0 +1,11 @@
+import helmet from "helmet";
+import express from "express";
+import ApiNotFound from "./middlewares/NotFound.js";
+import cors from "cors";
+const app = express();
+app.use(express.json());
+app.use(helmet());
+app.use(cors({ origin: ["*"] }));
+// app.use("/api/v1", router);
+app.use(ApiNotFound);
+export default app;
