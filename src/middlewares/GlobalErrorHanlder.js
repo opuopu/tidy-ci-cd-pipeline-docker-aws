@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import handleValidationError from "../errors/handleValidationError.js";
 import handleCastError from "../errors/HandleCastError.js";
-import AppiError from "../errors/ApiError.js";
+import AppError from "../errors/AppError.js";
 import handleDuplicateError from "../errors/handleDuplicateError.js";
 import handleZodError from "../errors/handleZodError.js";
 
@@ -35,7 +35,7 @@ const globalErrorHandler = (err, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
-  } else if (err instanceof AppiError) {
+  } else if (err instanceof AppError) {
     statusCode = err?.statusCode;
     message = err.message;
     errorSources = [

@@ -3,11 +3,17 @@ import express from "express";
 import ApiNotFound from "./middlewares/NotFound.js";
 import cors from "cors";
 import globalErrorHandler from "./middlewares/GlobalErrorHanlder.js";
+
 const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors({ origin: ["*"] }));
 // app.use("/api/v1", router);
-app.use(ApiNotFound);
+
 app.use(globalErrorHandler);
+
+app.get("/", (req, res) => {
+  res.send("wow server is working!!");
+});
+app.use(ApiNotFound);
 export default app;
