@@ -5,7 +5,7 @@ import sendEmail from "../utils/sendEmail.js";
 import bcrypt from "bcrypt";
 import config from "../config/index.js";
 import { User } from "../models/user.model.js";
-
+import { createToken } from "../utils/auth.utils.js";
 const createAnOtpIntoDB = async (userId, email) => {
   const otp = Math.floor(100000 + Math.random() * 900000);
   const expiresAt = new Date(Date.now() + 3600000);
@@ -27,7 +27,7 @@ const createAnOtpIntoDB = async (userId, email) => {
       "something went wrong. otp not generated!"
     );
   }
-  await sendEmail(
+  const sendCode = await sendEmail(
     email,
     otp,
     "Your One-Time Verification Code",
@@ -41,8 +41,14 @@ const createAnOtpIntoDB = async (userId, email) => {
       </div>
     `
   );
-
-  return result;
+  if (!sendCode) {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Failed to sent otp. please try again"
+    );
+  }
+  // should refactor this code at home
+  const accessToken = createToken();
 };
 
 const verifyOtp = async (payload) => {

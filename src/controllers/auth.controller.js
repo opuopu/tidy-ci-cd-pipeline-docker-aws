@@ -20,8 +20,19 @@ const signIn = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const refreshToken = catchAsync(async (req, res) => {
+  const result = await authServices.refreshToken(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Access token is retrieved succesfully!",
+    data: result,
+  });
+});
 const authControllers = {
   signUp,
   signIn,
+  refreshToken,
 };
 export default authControllers;

@@ -2,7 +2,7 @@ import { User } from "../models/user.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import otpServices from "./otp.service.js";
-import { createToken } from "../utils/auth.utils.js";
+import { createToken, verifyToken } from "../utils/auth.utils.js";
 import config from "../config/index.js";
 const signUpIntoDB = async (payload) => {
   const { email } = payload;
@@ -67,8 +67,30 @@ const SignInUser = async (payload) => {
   };
 };
 
+const refreshToken = async (token) => {
+  const decodeToken = verifyToken(token, config.jwt_refresh_secret);
+  if (!verifyToken) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized");
+  }
+  const { userId, email, verified } = decodeToken;
+  const jwtPayload = {
+    userId,
+    email,
+    verified,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    jwt_access_secret,
+    jwt_access_expires_in
+  );
+  return {
+    accessToken,
+  };
+};
+
 const authServices = {
   signUpIntoDB,
   SignInUser,
+  refreshToken,
 };
 export default authServices;
