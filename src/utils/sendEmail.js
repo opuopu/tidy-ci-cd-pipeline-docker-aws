@@ -9,10 +9,10 @@ const transporter = nodemailer.createTransport({
     pass: config.nodemailer_host_pass,
   },
 });
-async function sendEmail(receiverGmail, code, subject, text, children) {
+async function sendEmail(receiverGmail, subject, text, children) {
   try {
     const info = await transporter.sendMail({
-      from: `tidy bayti adminv ${config.nodemailer_host_email}`, // sender address
+      from: `tidy bayti admin ${config.nodemailer_host_email}`, // sender address
       to: receiverGmail, // list of receivers
       subject: subject, // Subject line
       text: text, // plain text body
