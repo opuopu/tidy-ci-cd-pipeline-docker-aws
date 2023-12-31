@@ -1,10 +1,8 @@
-class AppiError extends Error {
+class AppError extends Error {
   statusCode;
-
   constructor(statusCode, message, stack = "") {
     super(message);
     this.statusCode = statusCode;
-
     if (stack) {
       this.stack = stack;
     } else {
@@ -12,5 +10,4 @@ class AppiError extends Error {
     }
   }
 }
-
-export default AppiError;
+export default AppError;
