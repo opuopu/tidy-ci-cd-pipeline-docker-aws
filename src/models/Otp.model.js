@@ -50,6 +50,10 @@ otpSchema.statics.isOtpExpired = async function (email, type) {
 
   return isOtpExpired ? true : false;
 };
-
+otpSchema.statics.deleteOtp = async function (email, type, expiresAt) {
+  return await Otp.deleteOne({
+    $and: [{ email: email }, { type: type }, { expiresAt: expiresAt }],
+  });
+};
 const Otp = model("Otp", otpSchema);
 export default Otp;

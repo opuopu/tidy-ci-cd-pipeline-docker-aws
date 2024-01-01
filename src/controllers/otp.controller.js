@@ -12,7 +12,7 @@ const createAnOtp = catchAsync(async (req, res, next) => {
   });
 });
 const verifyOtp = catchAsync(async (req, res, next) => {
-  const result = await otpServices.verifyOtp(req.body);
+  const result = await otpServices.verifyOtp(req.params.email, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -45,8 +45,8 @@ const createAnOtpIntoDB = async (email, type) => {
 
   // should refactor this code at home
 };
-const verifyOtp = async (payload) => {
-  const { email, verificationCode, type } = payload;
+const verifyOtp = async (email, payload) => {
+  const { verificationCode, type } = payload;
 
   const isExistOtp = await Otp.isExistOtp(email, type);
 
@@ -68,7 +68,11 @@ const verifyOtp = async (payload) => {
       "otp has expired. please resend it"
     );
   }
-  const isOtpMatched = Otp.isOtpMatched(verificationCode, isExistOtp?.otp);
+  const isOtpMatched = await Otp.isOtpMatched(
+    verificationCode,
+    isExistOtp?.otp
+  );
+
   if (!isOtpMatched)
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -81,20 +85,21 @@ const verifyOtp = async (payload) => {
     session.startTransaction();
     await User.updateOne({ email: email }, { verified: true }, { session });
     if (type === "signupVerification") {
-      await Otp.deleteOne(
+      result = await Otp.findOneAndDelete(
         { email: email, expiresAt: expiresAt, type: type },
         { session }
       );
-    }
-    result = await Otp.findByIdAndUpdate(
-      isExistOtp?._id,
-      {
-        $set: {
-          verificationStatus: true,
+    } else if (type === "forgotPassword") {
+      result = await Otp.findByIdAndUpdate(
+        isExistOtp?._id,
+        {
+          $set: {
+            verificationStatus: true,
+          },
         },
-      },
-      { new: true }
-    );
+        { new: true }
+      );
+    }
     await session.commitTransaction();
     await session.endSession();
   } catch (err) {
@@ -102,7 +107,7 @@ const verifyOtp = async (payload) => {
     await session.endSession();
     throw new Error(err);
   }
-  return result;
+  return null;
 };
 
 const otpServices = {

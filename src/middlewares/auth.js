@@ -4,9 +4,10 @@ import catchAsync from "../utils/catchAsync.js";
 import jwt from "jsonwebtoken";
 import config from "../config/index.js";
 import { User } from "../models/user.model.js";
-const auth = async (...userRoles) => {
+const auth = (...userRoles) => {
   return catchAsync(async (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
+    const token = req?.headers?.authorization?.split(" ")[1];
+    console.log(token);
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
     }
@@ -19,7 +20,7 @@ const auth = async (...userRoles) => {
     if (!isUserExist) {
       throw new AppError(httpStatus.NOT_FOUND, "user not found");
     }
-    if (requiredRoles && !requiredRoles.includes(role)) {
+    if (userRoles && !userRoles.includes(role)) {
       throw new AppError(httpStatus.UNAUTHORIZED, "You are not authorized ");
     }
     req.user = decode;

@@ -27,13 +27,16 @@ const userSchema = new Schema({
       type: String,
     },
   },
+  role: {
+    type: String,
+    enum: ["homeOwner", "employee"],
+  },
   verified: {
     type: Boolean,
     default: false,
   },
 });
 userSchema.pre("save", async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this; // doc
   // hashing password and save into DB
   user.password = await bcrypt.hash(
@@ -43,8 +46,12 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
+
 userSchema.statics.isUserExist = async function (email) {
   return await User.findOne({ email: email }).select("+password");
+};
+userSchema.statics.checkUserExistById = async function (id) {
+  return await User.findOne({ _id: id }).select("+password");
 };
 userSchema.statics.isPasswordMatched = async function (
   plainPassword,
