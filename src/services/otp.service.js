@@ -7,7 +7,7 @@ import config from "../config/index.js";
 import { User } from "../models/user.model.js";
 
 import mongoose from "mongoose";
-const createAnOtpIntoDB = async (userId, email, type) => {
+const createAnOtpIntoDB = async (email, type) => {
   const otp = Math.floor(100000 + Math.random() * 900000);
   const expiresAt = new Date(Date.now() + 3600000);
   const decryptOtp = await bcrypt.hash(
@@ -15,7 +15,6 @@ const createAnOtpIntoDB = async (userId, email, type) => {
     Number(config.bcrypt_salt_rounds)
   );
   const otpObj = {
-    userId,
     email,
     type,
     otp: decryptOtp,
@@ -46,11 +45,10 @@ const createAnOtpIntoDB = async (userId, email, type) => {
 
   // should refactor this code at home
 };
-
 const verifyOtp = async (payload) => {
-  const { userId, verificationCode, type } = payload;
+  const { email, verificationCode, type } = payload;
 
-  const isExistOtp = await Otp.isExistOtp(userId, type);
+  const isExistOtp = await Otp.isExistOtp(email, type);
 
   if (!isExistOtp) {
     throw new AppError(
@@ -62,9 +60,9 @@ const verifyOtp = async (payload) => {
     throw new AppError(httpStatus.BAD_REQUEST, "plese give verification code");
   }
   const { expiresAt } = isExistOtp;
-  const isOtpExpired = await Otp.isOtpExpired(userId, type);
+  const isOtpExpired = await Otp.isOtpExpired(email, type);
   if (isOtpExpired) {
-    await Otp.deleteOne({ userId: userId, expiresAt: expiresAt });
+    await Otp.deleteOne({ email: email, expiresAt: expiresAt });
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "otp has expired. please resend it"
@@ -77,12 +75,26 @@ const verifyOtp = async (payload) => {
       "otp did not match.plese try again"
     );
   // transaction and rollback
-
+  let result;
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    await User.updateOne({ _id: userId }, { verified: true }, { session });
-    await Otp.deleteOne({ userId: userId, expiresAt: expiresAt }, { session });
+    await User.updateOne({ email: email }, { verified: true }, { session });
+    if (type === "signupVerification") {
+      await Otp.deleteOne(
+        { email: email, expiresAt: expiresAt, type: type },
+        { session }
+      );
+    }
+    result = await Otp.findByIdAndUpdate(
+      isExistOtp?._id,
+      {
+        $set: {
+          verificationStatus: true,
+        },
+      },
+      { new: true }
+    );
     await session.commitTransaction();
     await session.endSession();
   } catch (err) {
@@ -90,7 +102,9 @@ const verifyOtp = async (payload) => {
     await session.endSession();
     throw new Error(err);
   }
+  return result;
 };
+
 const otpServices = {
   createAnOtpIntoDB,
   verifyOtp,

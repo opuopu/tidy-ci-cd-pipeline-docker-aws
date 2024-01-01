@@ -20,6 +20,7 @@ const verifyOtp = catchAsync(async (req, res, next) => {
     data: result ? result : null,
   });
 });
+
 const otpControllers = {
   createAnOtp,
   verifyOtp,

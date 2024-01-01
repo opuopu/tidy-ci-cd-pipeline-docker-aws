@@ -4,11 +4,6 @@ import config from "../config/index.js";
 import { User } from "./user.model.js";
 const otpSchema = new Schema(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "userId is required"],
-    },
     email: {
       type: String,
       required: [true, "email is required"],
@@ -21,7 +16,7 @@ const otpSchema = new Schema(
       type: Date,
       required: [true, "expired at is required"],
     },
-    expiresStatus: {
+    verificationStatus: {
       type: Boolean,
       default: false,
     },
@@ -36,19 +31,18 @@ const otpSchema = new Schema(
 );
 
 otpSchema.statics.isOtpMatched = async function (plainOtp, HasedOtp) {
-  console.log(plainOtp, HasedOtp);
   return await bcrypt.compare(plainOtp, HasedOtp);
 };
-otpSchema.statics.isExistOtp = async function (userId, type) {
+otpSchema.statics.isExistOtp = async function (email, type) {
   const isExistOtp = await Otp.findOne({
-    $and: [{ userId: userId }, { type: type }],
+    $and: [{ email: email }, { type: type }],
   });
   return isExistOtp;
 };
-otpSchema.statics.isOtpExpired = async function (userId, type) {
+otpSchema.statics.isOtpExpired = async function (email, type) {
   const isOtpExpired = await Otp.findOne({
     $and: [
-      { userId: userId },
+      { email: email },
       { type: type },
       { $expr: { $lt: ["$expiresAt", new Date()] } },
     ],

@@ -4,6 +4,7 @@ import httpStatus from "http-status";
 import otpServices from "./otp.service.js";
 import { createToken, verifyToken } from "../utils/auth.utils.js";
 import config from "../config/index.js";
+import Otp from "../models/Otp.model.js";
 const signUpIntoDB = async (payload) => {
   const { email } = payload;
   const user = await User.isUserExist(email);
@@ -27,7 +28,7 @@ const signUpIntoDB = async (payload) => {
       "something went wrong! please try again later"
     );
   }
-  await otpServices.createAnOtpIntoDB(result._id, email, "signupVerification");
+  await otpServices.createAnOtpIntoDB(email, "signupVerification");
 
   return result;
 };
@@ -94,9 +95,55 @@ const refreshToken = async (token) => {
   };
 };
 
+const forgotPassword = async (email) => {
+  const isUserExist = await User.isUserExist(email);
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email");
+  }
+  await otpServices.createAnOtpIntoDB(email, "forgotPassword");
+};
+
+const updatePassword = async (email, payload) => {
+  const { password } = payload;
+  const isUserExist = await User.isUserExist(email);
+  if (!isUserExist) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "user not exist with this email. please check your email again!"
+    );
+  }
+  const OtpVerificationStatus = await Otp.findOne({
+    $and: [
+      { email: email },
+      { type: "forgotPassword" },
+      { verificationStatus: true },
+    ],
+  });
+  if (!OtpVerificationStatus) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "something went wrong. please try again!"
+    );
+  }
+  const result = await User.findOneAndUpdate(
+    { email: email },
+    {
+      $set: {
+        password: password,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 const authServices = {
   signUpIntoDB,
   SignInUser,
   refreshToken,
+  forgotPassword,
+  updatePassword,
 };
 export default authServices;
