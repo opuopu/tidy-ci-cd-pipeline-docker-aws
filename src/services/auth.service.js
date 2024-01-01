@@ -7,11 +7,17 @@ import config from "../config/index.js";
 const signUpIntoDB = async (payload) => {
   const { email } = payload;
   const user = await User.isUserExist(email);
-  if (user) {
+  if (user && user?.verified) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "user already exist with the same email!"
     );
+  }
+  if (!user?.verified) {
+    const deleteUser = await User.deleteOne({ email });
+    if (!deleteUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
+    }
   }
 
   const result = await User.create(payload);
@@ -21,7 +27,7 @@ const signUpIntoDB = async (payload) => {
       "something went wrong! please try again later"
     );
   }
-  await otpServices.createAnOtpIntoDB(result._id, email);
+  await otpServices.createAnOtpIntoDB(result._id, email, "signupVerification");
 
   return result;
 };

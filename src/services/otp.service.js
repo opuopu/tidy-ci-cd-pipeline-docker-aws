@@ -5,8 +5,9 @@ import sendEmail from "../utils/sendEmail.js";
 import bcrypt from "bcrypt";
 import config from "../config/index.js";
 import { User } from "../models/user.model.js";
-import { createToken } from "../utils/auth.utils.js";
-const createAnOtpIntoDB = async (userId, email) => {
+
+import mongoose from "mongoose";
+const createAnOtpIntoDB = async (userId, email, type) => {
   const otp = Math.floor(100000 + Math.random() * 900000);
   const expiresAt = new Date(Date.now() + 3600000);
   const decryptOtp = await bcrypt.hash(
@@ -16,6 +17,7 @@ const createAnOtpIntoDB = async (userId, email) => {
   const otpObj = {
     userId,
     email,
+    type,
     otp: decryptOtp,
     expiresAt,
   };
@@ -24,10 +26,10 @@ const createAnOtpIntoDB = async (userId, email) => {
   if (!result) {
     throw new AppError(
       httpStatus.UNPROCESSABLE_ENTITY,
-      "something went wrong. otp not generated!"
+      "something went wrong. otp not generated!.please try again!"
     );
   }
-  const sendCode = await sendEmail(
+  await sendEmail(
     email,
     otp,
     "Your One-Time Verification Code",
@@ -41,47 +43,52 @@ const createAnOtpIntoDB = async (userId, email) => {
       </div>
     `
   );
-  if (!sendCode) {
-    throw new AppError(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to sent otp. please try again"
-    );
-  }
+
   // should refactor this code at home
-  const accessToken = createToken();
 };
 
 const verifyOtp = async (payload) => {
-  const { userId, verificationCode } = payload;
-  if (!userId) {
-    throw new AppError(httpStatus.NOT_FOUND, "user information not found");
+  const { userId, verificationCode, type } = payload;
+
+  const isExistOtp = await Otp.isExistOtp(userId, type);
+
+  if (!isExistOtp) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "otp information not found. please resend it!"
+    );
   }
   if (!verificationCode) {
     throw new AppError(httpStatus.BAD_REQUEST, "plese give verification code");
   }
-  const UserOtpRecord = await Otp.findOne({ userId: userId });
-  if (UserOtpRecord.length <= 0) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "user reocord not exist. please sign up again."
-    );
-  }
-  const { expiresAt, otp } = UserOtpRecord;
-  if (expiresAt < Date.now()) {
+  const { expiresAt } = isExistOtp;
+  const isOtpExpired = await Otp.isOtpExpired(userId, type);
+  if (isOtpExpired) {
     await Otp.deleteOne({ userId: userId, expiresAt: expiresAt });
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "otp has expired. please resend it"
     );
-  } else {
-    const isOtpMatched = Otp.isOtpMatched(verificationCode, otp);
-    if (!isOtpMatched)
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "otp did not match.plese try again"
-      );
-    await User.updateOne({ _id: userId }, { verified: true });
-    await Otp.deleteOne({ userId: userId, expiresAt: expiresAt });
+  }
+  const isOtpMatched = Otp.isOtpMatched(verificationCode, isExistOtp?.otp);
+  if (!isOtpMatched)
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "otp did not match.plese try again"
+    );
+  // transaction and rollback
+
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    await User.updateOne({ _id: userId }, { verified: true }, { session });
+    await Otp.deleteOne({ userId: userId, expiresAt: expiresAt }, { session });
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
   }
 };
 const otpServices = {
