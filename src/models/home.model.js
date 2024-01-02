@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const homeSchema = new Schema(
   {
-    name: {
+    title: {
       type: String,
       required: [true, "title is required"],
     },

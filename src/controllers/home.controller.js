@@ -4,6 +4,7 @@ import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 
 const createHome = catchAsync(async (req, res, next) => {
+  console.log(req.user);
   const result = await homeServices.inserHomeIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
