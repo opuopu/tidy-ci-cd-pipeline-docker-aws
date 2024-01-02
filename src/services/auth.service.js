@@ -2,7 +2,11 @@ import { User } from "../models/user.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import otpServices from "./otp.service.js";
-import { createToken, verifyToken } from "../utils/auth.utils.js";
+import {
+  createToken,
+  generateRefferalCode,
+  verifyToken,
+} from "../utils/auth.utils.js";
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 const signUpIntoDB = async (payload) => {
@@ -20,8 +24,12 @@ const signUpIntoDB = async (payload) => {
       throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
     }
   }
+  const finalObj = {
+    ...payload,
+    refferalCode: generateRefferalCode(),
+  };
 
-  const result = await User.create(payload);
+  const result = await User.create(finalObj);
   if (!result) {
     throw new AppError(
       httpStatus.UNPROCESSABLE_ENTITY,

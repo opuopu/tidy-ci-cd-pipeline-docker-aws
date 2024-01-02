@@ -6,6 +6,7 @@ const validateRequest = (zodSchema) => {
       body: req.body,
       //   cookie: req.cookie,
     });
+    next();
   });
 };
 export default validateRequest;

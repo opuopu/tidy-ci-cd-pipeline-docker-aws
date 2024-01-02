@@ -19,6 +19,10 @@ const userSchema = new Schema({
     select: 0,
     required: [true, "password is required"],
   },
+  refferalCode: {
+    type: String,
+    unique: true,
+  },
   profileImage: {
     publicUrl: {
       type: String,

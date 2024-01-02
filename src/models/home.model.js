@@ -2,13 +2,18 @@ import { Schema, model } from "mongoose";
 
 const homeSchema = new Schema(
   {
-    title: {
+    name: {
       type: String,
       required: [true, "title is required"],
     },
     user: {
       type: Schema.Types.ObjectId,
+      required: [true, "user id is required"],
       ref: "User",
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      required: [true, "home category is required"],
     },
   },
   {

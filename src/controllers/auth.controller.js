@@ -3,6 +3,7 @@ import authServices from "../services/auth.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 const signUp = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   const result = await authServices.signUpIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
