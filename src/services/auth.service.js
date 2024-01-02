@@ -28,7 +28,7 @@ const signUpIntoDB = async (payload) => {
       "something went wrong! please try again later"
     );
   }
-  otpServices.createAnOtpIntoDB(email, "signupVerification");
+  await otpServices.createAnOtpIntoDB(email, "signupVerification");
 
   return result;
 };
