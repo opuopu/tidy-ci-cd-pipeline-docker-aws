@@ -1,6 +1,6 @@
 import catchAsync from "../utils/catchAsync.js";
 
-const validateRequest = async (zodSchema) => {
+const validateRequest = (zodSchema) => {
   return catchAsync(async (req, res, next) => {
     await zodSchema.parseAsync({
       body: req.body,
