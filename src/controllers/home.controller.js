@@ -17,7 +17,7 @@ const getAllHomes = catchAsync(async (req, res, next) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "All homes have been retrieved successfully.",
+    message: "homes are retrieved successfully.",
     data: result,
   });
 });

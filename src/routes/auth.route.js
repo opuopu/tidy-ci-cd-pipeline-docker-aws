@@ -11,7 +11,7 @@ router.post("/forgotPassword", authControllers.forgotPassword);
 router.patch("/updatePassword/:email", authControllers.updatePassword);
 router.patch(
   "/resetPassword/:id",
-  auth(USER_ROLE.HomeOwner, USER_ROLE.EMPLOYEE),
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   authControllers.resetPassword
 );
 const authRoutes = router;

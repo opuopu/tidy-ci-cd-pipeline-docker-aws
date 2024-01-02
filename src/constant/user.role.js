@@ -1,4 +1,5 @@
 export const USER_ROLE = {
-  HomeOwner: "homeOwner",
+  ADMIN: "admin",
+  HOMEOWNER: "homeOwner",
   EMPLOYEE: "employee",
 };
