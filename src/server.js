@@ -9,9 +9,11 @@ let server;
 async function main() {
   try {
     await mongoose.connect(config.database_url);
-    server = app.listen(config.port, () => {
+    server = app.listen(config.port, config.ip, () => {
       console.log(`app is listening on port ${config.port}`);
-      infoLogger.info(`app is listening on port ${config.port}`);
+      infoLogger.info(
+        `Server is running at http://${config.ip}:${config.port}`
+      );
     });
   } catch (error) {
     console.log(error);
