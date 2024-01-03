@@ -11,10 +11,6 @@ const homeSchema = new Schema(
       required: [true, "user id is required"],
       ref: "User",
     },
-    category: {
-      type: Schema.Types.ObjectId,
-      required: [true, "home category is required"],
-    },
   },
   {
     timestamps: true,
