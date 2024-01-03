@@ -5,11 +5,16 @@ import homeRoutes from "./home.route.js";
 import homeCategoryRoutes from "./homeCategory.Route.js";
 import roomRoutes from "./room.route.js";
 import roomPresetRoutes from "./roomPreset.route.js";
+import userRoutes from "./user.route.js";
 const router = Router();
 const moduleRoutes = [
   {
     path: "/auth",
     route: authRoutes,
+  },
+  {
+    path: "/users",
+    route: userRoutes,
   },
   {
     path: "/otps",

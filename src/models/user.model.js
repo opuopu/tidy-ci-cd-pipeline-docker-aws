@@ -31,6 +31,9 @@ const userSchema = new Schema({
       type: String,
     },
   },
+  address: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ["homeOwner", "employee"],

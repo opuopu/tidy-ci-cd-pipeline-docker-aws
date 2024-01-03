@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 const homeSchema = new Schema(
   {
     title: {
