@@ -1,48 +1,41 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import config from "../config/index.js";
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: [true, "name   is required"],
-  },
-  phoneNumber: {
-    type: Number,
-    required: [true, "phone number is required"],
-  },
-  email: {
-    type: String,
-    required: [true, "email is required"],
-  },
-  password: {
-    type: String,
-    select: 0,
-    required: [true, "password is required"],
-  },
-  refferalCode: {
-    type: String,
-    unique: true,
-  },
-  profileImage: {
-    publicUrl: {
+const userSchema = new Schema(
+  {
+    name: {
       type: String,
+      required: [true, "name   is required"],
     },
-    path: {
+    phoneNumber: {
+      type: Number,
+      required: [true, "phone number is required"],
+    },
+    email: {
       type: String,
+      required: [true, "email is required"],
+    },
+    password: {
+      type: String,
+      select: 0,
+      required: [true, "password is required"],
+    },
+    passwordChangedAt: {
+      type: Date,
+    },
+    role: {
+      type: String,
+      enum: ["homeOwner", "employee"],
+    },
+    verified: {
+      type: Boolean,
+      default: false,
     },
   },
-  address: {
-    type: String,
-  },
-  role: {
-    type: String,
-    enum: ["homeOwner", "employee"],
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 userSchema.pre("save", async function (next) {
   const user = this; // doc
   // hashing password and save into DB

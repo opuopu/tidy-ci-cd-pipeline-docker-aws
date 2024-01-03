@@ -41,6 +41,39 @@ const signUpIntoDB = async (payload) => {
   return result;
 };
 
+// create homeOwner
+const signupHomeOwnerIntoDB = async (payload) => {
+  const user = await User.isUserExist(email);
+  const { email } = payload;
+  if (user && user?.verified) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "user already exist with the same email!"
+    );
+  }
+  if (!user?.verified) {
+    const deleteUser = await User.deleteOne({ email });
+    if (!deleteUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
+    }
+  }
+  const finalObj = {
+    ...payload,
+    refferalCode: generateRefferalCode(),
+  };
+
+  const result = await User.create(finalObj);
+  if (!result) {
+    throw new AppError(
+      httpStatus.UNPROCESSABLE_ENTITY,
+      "something went wrong! please try again later"
+    );
+  }
+  await otpServices.createAnOtpIntoDB(email, "signupVerification");
+
+  return result;
+};
+
 const SignInUser = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);

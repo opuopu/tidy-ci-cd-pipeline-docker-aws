@@ -6,6 +6,7 @@ import homeCategoryRoutes from "./homeCategory.Route.js";
 import roomRoutes from "./room.route.js";
 import roomPresetRoutes from "./roomPreset.route.js";
 import userRoutes from "./user.route.js";
+import homeOwnerRoutes from "./homeOwner.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -15,6 +16,10 @@ const moduleRoutes = [
   {
     path: "/users",
     route: userRoutes,
+  },
+  {
+    path: "/homeowners",
+    route: homeOwnerRoutes,
   },
   {
     path: "/otps",
