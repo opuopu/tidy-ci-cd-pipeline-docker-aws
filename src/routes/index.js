@@ -8,6 +8,7 @@ import roomPresetRoutes from "./roomPreset.route.js";
 import userRoutes from "./user.route.js";
 import homeOwnerRoutes from "./homeOwner.route.js";
 import groceryCategoryRoutes from "./groceryCategory.route.js";
+import groceryListRoutes from "./groceryList.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -45,6 +46,10 @@ const moduleRoutes = [
   {
     path: "/grocery-categories",
     route: groceryCategoryRoutes,
+  },
+  {
+    path: "/grocery-lists",
+    route: groceryListRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
