@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 const homeOwnerSchema = new Schema({
-  userId: {
+  user: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },

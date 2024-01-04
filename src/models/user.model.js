@@ -3,10 +3,6 @@ import bcrypt from "bcrypt";
 import config from "../config/index.js";
 const userSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: [true, "name   is required"],
-    },
     phoneNumber: {
       type: Number,
       required: [true, "phone number is required"],

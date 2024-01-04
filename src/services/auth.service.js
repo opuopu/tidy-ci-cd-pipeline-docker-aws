@@ -2,6 +2,7 @@ import { User } from "../models/user.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import otpServices from "./otp.service.js";
+import mongoose from "mongoose";
 import {
   createToken,
   generateRefferalCode,
@@ -9,69 +10,72 @@ import {
 } from "../utils/auth.utils.js";
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
-const signUpIntoDB = async (payload) => {
-  const { email } = payload;
-  const user = await User.isUserExist(email);
-  if (user && user?.verified) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "user already exist with the same email!"
-    );
-  }
-  if (!user?.verified) {
-    const deleteUser = await User.deleteOne({ email });
-    if (!deleteUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
-    }
-  }
-  const finalObj = {
-    ...payload,
-    refferalCode: generateRefferalCode(),
-  };
-
-  const result = await User.create(finalObj);
-  if (!result) {
-    throw new AppError(
-      httpStatus.UNPROCESSABLE_ENTITY,
-      "something went wrong! please try again later"
-    );
-  }
-  await otpServices.createAnOtpIntoDB(email, "signupVerification");
-
-  return result;
-};
+import HomeOwner from "../models/homeOwner.model.js";
 
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
-  const user = await User.isUserExist(email);
   const { email } = payload;
+  console.log(email);
+  const user = await User.isUserExist(email);
+
   if (user && user?.verified) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "user already exist with the same email!"
     );
   }
-  if (!user?.verified) {
-    const deleteUser = await User.deleteOne({ email });
-    if (!deleteUser) {
-      throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
+  const session = await mongoose.startSession();
+  let result;
+  try {
+    session.startTransaction();
+    if (user && !user?.verified) {
+      const deleteUser = await User.findOneAndDelete(
+        { email: email },
+        { session }
+      );
+      console.log(deleteUser);
+      if (!deleteUser) {
+        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
+      }
+      const deletehomeOwner = await HomeOwner.findOneAndDelete(
+        {
+          user: user?._id,
+        },
+        { session }
+      );
+      if (!deletehomeOwner) {
+        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
+      }
     }
-  }
-  const finalObj = {
-    ...payload,
-    refferalCode: generateRefferalCode(),
-  };
 
-  const result = await User.create(finalObj);
-  if (!result) {
-    throw new AppError(
-      httpStatus.UNPROCESSABLE_ENTITY,
-      "something went wrong! please try again later"
-    );
+    const authObj = {
+      email: payload.email,
+      password: payload.password,
+      role: payload.role,
+      phoneNumber: payload.phoneNumber,
+    };
+
+    const createnewUser = await User.create([authObj], { session });
+    if (!createnewUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to create user");
+    }
+
+    const finalObj = {
+      ...payload,
+      user: createnewUser[0]?._id,
+      refferalCode: generateRefferalCode(),
+    };
+    result = await HomeOwner.create([finalObj], { session });
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
   }
+
   await otpServices.createAnOtpIntoDB(email, "signupVerification");
-
-  return result;
+  return result[0];
 };
 
 const SignInUser = async (payload) => {
@@ -202,11 +206,11 @@ const resetPassword = async (id, payload) => {
   return result;
 };
 const authServices = {
-  signUpIntoDB,
   SignInUser,
   refreshToken,
   forgotPassword,
   updatePassword,
   resetPassword,
+  signupHomeOwnerIntoDB,
 };
 export default authServices;
