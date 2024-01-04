@@ -1,11 +1,15 @@
 import httpStatus from "http-status";
 import AppError from "../errors/AppError.js";
 import { User } from "../models/user.model.js";
+import HomeOwner from "../models/homeOwner.model.js";
 
 const getme = async (userId, role) => {
-  console.log(userId, role);
-  const result = await User.findOne({ _id: userId, role: role });
-  console.log(result);
+  let result;
+  if (role === "homeOwner") {
+    result = await HomeOwner.findOne({ user: userId }).populate("user");
+  } else if (role === "employee") {
+  }
+
   return result;
 };
 
