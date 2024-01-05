@@ -4,6 +4,7 @@ import otpRoutes from "./otp.routes.js";
 import homeRoutes from "./home.route.js";
 import homeCategoryRoutes from "./homeCategory.Route.js";
 import roomRoutes from "./room.route.js";
+import tagsRoutes from "./tags.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -25,6 +26,10 @@ const moduleRoutes = [
   {
     path: "/room",
     route: roomRoutes,
+  },
+  {
+    path: "/tags",
+    route: tagsRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
