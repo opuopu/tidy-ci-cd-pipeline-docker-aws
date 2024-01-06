@@ -36,7 +36,12 @@ const recipeSchema = new Schema(
         ref: "Tags",
       },
     ],
+    favouriteList: {
+      type: Boolean,
+      default: false,
+    },
   },
+
   {
     timestamps: true,
   }
