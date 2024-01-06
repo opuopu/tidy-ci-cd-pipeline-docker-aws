@@ -4,14 +4,13 @@ import otpRoutes from "./otp.routes.js";
 import homeRoutes from "./home.route.js";
 import homeCategoryRoutes from "./homeCategory.Route.js";
 import roomRoutes from "./room.route.js";
-
 import tagsRoutes from "./tags.route.js";
-
 import roomPresetRoutes from "./roomPreset.route.js";
 import userRoutes from "./user.route.js";
 import homeOwnerRoutes from "./homeOwner.route.js";
 import groceryCategoryRoutes from "./groceryCategory.route.js";
 import groceryListRoutes from "./groceryList.route.js";
+import recipeRoutes from "./recipe.routes.js";
 
 const router = Router();
 const moduleRoutes = [
@@ -48,7 +47,6 @@ const moduleRoutes = [
     route: roomRoutes,
   },
   {
-
     path: "/tags",
     route: tagsRoutes,
 
@@ -58,7 +56,10 @@ const moduleRoutes = [
   {
     path: "/grocery-lists",
     route: groceryListRoutes,
-
+  },
+  {
+    path: "/recipes",
+    route: recipeRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
