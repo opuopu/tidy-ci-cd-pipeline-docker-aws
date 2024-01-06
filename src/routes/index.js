@@ -4,7 +4,15 @@ import otpRoutes from "./otp.routes.js";
 import homeRoutes from "./home.route.js";
 import homeCategoryRoutes from "./homeCategory.Route.js";
 import roomRoutes from "./room.route.js";
+
 import tagsRoutes from "./tags.route.js";
+
+import roomPresetRoutes from "./roomPreset.route.js";
+import userRoutes from "./user.route.js";
+import homeOwnerRoutes from "./homeOwner.route.js";
+import groceryCategoryRoutes from "./groceryCategory.route.js";
+import groceryListRoutes from "./groceryList.route.js";
+
 const router = Router();
 const moduleRoutes = [
   {
@@ -12,24 +20,45 @@ const moduleRoutes = [
     route: authRoutes,
   },
   {
-    path: "/otp",
+    path: "/users",
+    route: userRoutes,
+  },
+  {
+    path: "/homeowners",
+    route: homeOwnerRoutes,
+  },
+  {
+    path: "/otps",
     route: otpRoutes,
   },
   {
-    path: "/home",
+    path: "/homes",
     route: homeRoutes,
   },
   {
-    path: "/homeCategory",
+    path: "/home-categories",
     route: homeCategoryRoutes,
   },
   {
-    path: "/room",
+    path: "/room-presets",
+    route: roomPresetRoutes,
+  },
+  {
+    path: "/rooms",
     route: roomRoutes,
   },
   {
+
     path: "/tags",
     route: tagsRoutes,
+
+    path: "/grocery-categories",
+    route: groceryCategoryRoutes,
+  },
+  {
+    path: "/grocery-lists",
+    route: groceryListRoutes,
+
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

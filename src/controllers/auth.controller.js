@@ -2,13 +2,13 @@ import httpStatus from "http-status";
 import authServices from "../services/auth.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
-const signUp = catchAsync(async (req, res, next) => {
-  console.log(req.body);
-  const result = await authServices.signUpIntoDB(req.body);
+
+const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
+  const result = await authServices.signupHomeOwnerIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "user created successfully",
+    message: "user Sign up successfully",
     data: result,
   });
 });
@@ -60,7 +60,7 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 const authControllers = {
-  signUp,
+  signupHomeOwnerIntoDB,
   signIn,
   refreshToken,
   forgotPassword,

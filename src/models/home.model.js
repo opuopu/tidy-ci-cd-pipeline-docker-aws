@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 const homeSchema = new Schema(
   {
     title: {
@@ -10,10 +9,6 @@ const homeSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: [true, "user id is required"],
       ref: "User",
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      required: [true, "home category is required"],
     },
   },
   {

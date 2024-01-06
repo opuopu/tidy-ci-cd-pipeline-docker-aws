@@ -13,7 +13,8 @@ const inserRoomIntoDB = catchAsync(async (req, res) => {
   });
 });
 const getRoomsByQuery = catchAsync(async (req, res) => {
-  const result = await roomServices.getRoomsByQuery(req.query);
+  const { userId } = req.query;
+  const result = await roomServices.getRoomsByQuery(userId, req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
