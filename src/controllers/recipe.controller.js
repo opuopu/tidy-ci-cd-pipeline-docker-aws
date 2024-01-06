@@ -1,3 +1,4 @@
+import httpStatus from "http-status";
 import recipeServices from "../services/recipe.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -6,7 +7,7 @@ const insertRecipeIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
   const data = {
     ...req.body,
-    userId,
+    user: userId,
   };
   const result = await recipeServices.insertRecipeIntoDB(data);
   sendResponse(res, {
@@ -19,7 +20,11 @@ const insertRecipeIntoDB = catchAsync(async (req, res) => {
 
 const getAllRecipesByQuery = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const result = await recipeServices.getAllRecipesByQuery(userId);
+  const query = {
+    user: userId,
+    ...req.query,
+  };
+  const result = await recipeServices.getAllRecipesByQuery(query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -62,11 +67,53 @@ const deleteRecipe = catchAsync(async (req, res) => {
   });
 });
 
+const addToFavoriteRecipes = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  const result = await recipeServices.addToFavoriteRecipes(
+    req.params.id,
+    userId
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Recipe successfully added to your favorites!",
+    data: result,
+  });
+});
+const getAllFavoriteRecipes = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  const result = await recipeServices.getAllFavoriteRecipes(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "favourite recipes retrived successfully",
+    data: result,
+  });
+});
+const removeRecipeFromFavoritelist = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  const result = await recipeServices.removeRecipeFromFavoritelist(
+    req.params.id,
+    userId
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Recipe successfully removed from the list.",
+    data: result,
+  });
+});
+
 const recipeControllers = {
   insertRecipeIntoDB,
   getAllRecipesByQuery,
   getSingleRecipe,
   updateRecipe,
   deleteRecipe,
+  addToFavoriteRecipes,
+  getAllFavoriteRecipes,
+  removeRecipeFromFavoritelist,
 };
 export default recipeControllers;
