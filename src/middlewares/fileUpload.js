@@ -9,7 +9,6 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + uniqueSuffix);
   },
 });
-
 const upload = {
   storage: storage,
   limits: {

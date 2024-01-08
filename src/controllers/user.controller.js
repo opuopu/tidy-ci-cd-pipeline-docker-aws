@@ -5,6 +5,7 @@ import sendResponse from "../utils/sendResponse.js";
 
 const getme = catchAsync(async (req, res) => {
   const { userId, role } = req.user;
+  console.log(req.user);
   const result = await userServices.getme(userId, role);
   sendResponse(res, {
     statusCode: httpStatus.OK,
