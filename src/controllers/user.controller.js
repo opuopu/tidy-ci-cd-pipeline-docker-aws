@@ -15,8 +15,19 @@ const getme = catchAsync(async (req, res) => {
   });
 });
 const updateMyProfile = catchAsync(async (req, res) => {
+  const file = {};
   const { userId, role } = req.user;
-  const result = await userServices.updateMyProfile(userId, role, req.body);
+  const port = req.get("port") || 5000;
+  if (req.file) {
+    file.publicUrl = `${req.protocol}://${req.hostname}:${port}/public/uploads/profile/${req?.file?.filename}`;
+    file.path = req?.file?.path;
+  }
+  const result = await userServices.updateMyProfile(
+    userId,
+    role,
+    file,
+    req.body
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

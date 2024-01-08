@@ -15,9 +15,12 @@ const getme = async (userId, role) => {
   return result;
 };
 
-const updateMyProfile = async (userId, role, payload) => {
+const updateMyProfile = async (userId, role, file, payload) => {
   console.log(payload);
   const { password, role: clientRole, phoneNumber, email } = payload;
+  if (file) {
+    payload.profileImage = file;
+  }
   if (password || clientRole) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
