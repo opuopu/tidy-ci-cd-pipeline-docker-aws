@@ -2,10 +2,11 @@ import express from "express";
 import auth from "../middlewares/auth.js";
 import { USER_ROLE } from "../constant/user.role.js";
 import userControllers from "../controllers/user.controller.js";
-import upload from "../middlewares/fileUpload.js";
 import parseData from "../middlewares/parseData.js";
-const router = express.Router();
+import fileUpload from "../middlewares/fileUpload.js";
 
+const router = express.Router();
+const upload = fileUpload("./public/uploads/profile/");
 router.get(
   "/my-profile",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
