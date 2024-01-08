@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 const budgetCategorySchema = new Schema(
   {
     title: {
