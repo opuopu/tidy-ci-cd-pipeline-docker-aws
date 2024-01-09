@@ -3,7 +3,7 @@ import AppError from "../errors/AppError.js";
 import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import HomeOwner from "../models/homeOwner.model.js";
-
+import { deleteFile } from "../utils/file.utils.js";
 const getme = async (userId, role) => {
   let result;
   if (role === "homeOwner") {
@@ -16,7 +16,6 @@ const getme = async (userId, role) => {
 };
 
 const updateMyProfile = async (userId, role, file, payload) => {
-  console.log(payload);
   const { password, role: clientRole, phoneNumber, email } = payload;
   if (file) {
     payload.profileImage = file;
@@ -27,12 +26,16 @@ const updateMyProfile = async (userId, role, file, payload) => {
       "something went wrong. please try again later"
     );
   }
-
+  const findFilePath = await HomeOwner.findOne({ user: userId });
+  if (findFilePath && findFilePath.profileImage?.path) {
+    await deleteFile(findFilePath.profileImage?.path);
+  }
   const session = await mongoose.startSession();
   let result;
 
   try {
     session.startTransaction();
+
     let updateAuthInformation;
     if (phoneNumber || email) {
       updateAuthInformation = await User.findByIdAndUpdate(
