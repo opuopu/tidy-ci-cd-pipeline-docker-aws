@@ -1,23 +1,51 @@
-import budgetCategory from "../models/budgetCategory.model.js";
+import QueryBuilder from "../builder/QueryBuilder.js";
+import Budget from "../models/budget.model.js";
 
-const insertBudgetCategoryIntoDb = async (payload) => {
-  const result = await budgetCategory.create(payload);
+const insertBudgetIntoDB = async (payload) => {
+  const result = await Budget.create(payload);
   return result;
 };
 
-const getallFromDb = async () => {
-  const result = await budgetCategory.find({});
+const getbudgetsByQuery = async (payload) => {
+  const query = {};
+  const budgetQuery = new QueryBuilder(Budget.find, query)
+    .search()
+    .filter()
+    .paginate()
+    .sort();
+  const result = await budgetQuery.modelQuery;
+  const meta = await budgetQuery.meta();
+  return {
+    meta,
+    result,
+  };
+};
+const getSingleBudget = async (id) => {
+  const result = await Budget.findById(id);
   return result;
 };
 
-const getSingleFromDb = async (id) => {
-  const result = await budgetCategory.findById(id);
+const updateBudget = async (id, userId, payload) => {
+  const result = await Budget.findOneAndUpdate(
+    { _id: id, user: userId },
+    payload,
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
-const budgetCategoryServices = {
-  insertBudgetCategoryIntoDb,
-  getallFromDb,
-  getSingleFromDb,
+const deleteBudget = async (id, userId) => {
+  const result = await Budget.findOneAndDelete({ _id: id, user: userId });
+  return result;
 };
-export default budgetCategoryServices;
+
+const budgetServices = {
+  insertBudgetIntoDB,
+  getbudgetsByQuery,
+  getSingleBudget,
+  updateBudget,
+  deleteBudget,
+};
+export default budgetServices;
