@@ -12,6 +12,7 @@ import groceryCategoryRoutes from "./groceryCategory.route.js";
 import groceryListRoutes from "./groceryList.route.js";
 import recipeRoutes from "./recipe.routes.js";
 import budgetCategoryRoutes from "./budgetCategory.route.js";
+import budgetRoutes from "./budget.route.js";
 
 const router = Router();
 const moduleRoutes = [
@@ -65,6 +66,10 @@ const moduleRoutes = [
   {
     path: "/budget-categories",
     route: budgetCategoryRoutes,
+  },
+  {
+    path: "/budgets",
+    route: budgetRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
