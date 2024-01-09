@@ -17,9 +17,11 @@ const getme = catchAsync(async (req, res) => {
 const updateMyProfile = catchAsync(async (req, res) => {
   const file = {};
   const { userId, role } = req.user;
-  const port = req.get("port") || 5000;
+
   if (req.file) {
-    file.publicUrl = `${req.protocol}://${req.hostname}:${port}/public/uploads/profile/${req?.file?.filename}`;
+    file.publicUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/public/uploads/profile/${req?.file?.filename}`;
     file.path = req?.file?.path;
   }
   const result = await userServices.updateMyProfile(
