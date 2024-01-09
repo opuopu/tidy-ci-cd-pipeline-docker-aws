@@ -7,7 +7,7 @@ const fileUpload = (uploadDirectory) => {
   }
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "./public/uploads/profile/");
+      cb(null, uploadDirectory);
     },
     filename: function (req, file, cb) {
       const parts = file.originalname.split(".");
@@ -24,15 +24,19 @@ const fileUpload = (uploadDirectory) => {
     limits: {
       fileSize: 2000000,
     },
+
     fileFilter: function (req, file, cb) {
+      console.log(file);
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpg" ||
-        file.mimetype === "image/jpeg"
+        file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/svg" ||
+        file.mimetype === "image/svg+xml"
       ) {
         cb(null, true);
       } else {
-        cb(new Error("only png,jpg,jpeg format allowed"), false);
+        cb(new Error("only png,jpg,jpeg,svg format allowed"), false);
       }
     },
   });
