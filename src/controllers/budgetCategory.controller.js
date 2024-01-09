@@ -1,7 +1,8 @@
 import httpStatus from "http-status";
-import budgetCategoryServices from "../services/budget.service.js";
+
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
+import budgetCategoryServices from "../services/budgetCategory.service.js";
 
 const insertBudgetCategoryIntoDb = catchAsync(async (req, res) => {
   const file = {};
