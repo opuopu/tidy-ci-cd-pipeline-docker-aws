@@ -16,7 +16,30 @@ const insertUserGroceryListsIntoDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
+const getUserGroceryLists = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  req.query.homeOwner = userId;
+  const result = await userGroceryListServices.getUserGroceryLists(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "grocery Lists Retrived successfully",
+    data: result,
+  });
+});
+const getuserSingleGroceryList = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  req.query.homeOwner = userId;
+  const result = await userGroceryListServices.getuserSingleGroceryList(
+    req.params.id
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "grocery List Retrived successfully",
+    data: result,
+  });
+});
 const findGroceryFromGroceryLists = catchAsync(async (req, res) => {
   const result = await userGroceryListServices.findGroceryFromGroceryLists(
     req.query
@@ -53,6 +76,8 @@ const deleteSingleGrocery = catchAsync(async (req, res) => {
 const userGroceryListControllers = {
   insertUserGroceryListsIntoDB,
   findGroceryFromGroceryLists,
+  getUserGroceryLists,
+  getuserSingleGroceryList,
   deleteUserGrocery,
   deleteSingleGrocery,
 };

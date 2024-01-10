@@ -3,7 +3,7 @@ const userGrocerySchema = new Schema(
   {
     homeOwner: {
       type: Types.ObjectId,
-      ref: "HomeOwner",
+      ref: "User",
     },
     assignedEmployee: {
       type: String,
