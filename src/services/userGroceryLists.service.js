@@ -25,10 +25,18 @@ const deleteUserGrocery = async (id) => {
   const result = await UserGroceryList.findByIdAndDelete(id);
   return result;
 };
-
+const deleteSingleGrocery = async (id, groceryId) => {
+  const result = await UserGroceryList.findByIdAndUpdate(id, {
+    $pull: {
+      groceryLists: groceryId,
+    },
+  });
+  return result;
+};
 const userGroceryListServices = {
   insertUserGroceryListsIntoDB,
   findGroceryFromGroceryLists,
   deleteUserGrocery,
+  deleteSingleGrocery,
 };
 export default userGroceryListServices;
