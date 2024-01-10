@@ -1,5 +1,4 @@
 import { Schema, model, Types } from "mongoose";
-
 const groceryListSchema = new Schema(
   {
     name: {
