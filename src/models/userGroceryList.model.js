@@ -1,5 +1,4 @@
 import { Schema, Types, model } from "mongoose";
-
 const userGrocerySchema = new Schema(
   {
     homeOwner: {
