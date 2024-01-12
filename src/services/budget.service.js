@@ -8,14 +8,14 @@ const insertBudgetIntoDB = async (payload) => {
 
 const getbudgetsByQuery = async (userId, payload) => {
   const query = userId ? { ...payload, user: userId } : { ...payload };
-  const budgetQuery = new QueryBuilder(Budget.find(), query)
+  const budgetModel = new QueryBuilder(Budget.find(), query)
     .search()
     .filter()
     .paginate()
     .sort()
-    .select();
-  const result = await budgetQuery.modelQuery;
-  const meta = await budgetQuery.meta();
+    .fields();
+  const result = await budgetModel.modelQuery;
+  const meta = await budgetModel.meta();
   return {
     meta,
     result,

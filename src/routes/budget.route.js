@@ -16,7 +16,7 @@ router.get(
 router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  budgetControllers.getbudgetsByQuery
+  budgetControllers.getsingleBudget
 );
 router.patch("/:id", auth(USER_ROLE.HOMEOWNER), budgetControllers.updateBudget);
 router.delete(
