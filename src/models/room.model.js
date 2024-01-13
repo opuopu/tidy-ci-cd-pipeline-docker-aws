@@ -15,10 +15,6 @@ const roomSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    preset: {
-      type: Schema.Types.ObjectId,
-      ref: "RoomPreset",
-    },
   },
   {
     timestamps: true,
