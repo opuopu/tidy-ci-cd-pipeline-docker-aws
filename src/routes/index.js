@@ -14,6 +14,7 @@ import budgetRoutes from "./budget.route.js";
 import userGroceryListsRoutes from "./userGroceryList.route.js";
 import taskCategoryRoutes from "./taskCategory.route.js";
 import taskListRoutes from "./taskList.route.js";
+import userTasksRoutes from "./userTask.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -75,6 +76,10 @@ const moduleRoutes = [
   {
     path: "/tasks-presets",
     route: taskListRoutes,
+  },
+  {
+    path: "/user-tasks",
+    route: userTasksRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
