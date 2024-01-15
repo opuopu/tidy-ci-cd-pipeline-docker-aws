@@ -1,4 +1,4 @@
-import { Schema, model, types } from "mongoose";
+import { Schema, model } from "mongoose";
 
 const taskCategorySchema = new Schema(
   {
