@@ -12,7 +12,8 @@ import recipeRoutes from "./recipe.routes.js";
 import budgetCategoryRoutes from "./budgetCategory.route.js";
 import budgetRoutes from "./budget.route.js";
 import userGroceryListsRoutes from "./userGroceryList.route.js";
-
+import taskCategoryRoutes from "./taskCategory.route.js";
+import taskListRoutes from "./taskList.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -66,6 +67,14 @@ const moduleRoutes = [
   {
     path: "/user-grocery-lists",
     route: userGroceryListsRoutes,
+  },
+  {
+    path: "/task-categories",
+    route: taskCategoryRoutes,
+  },
+  {
+    path: "/tasks-presets",
+    route: taskListRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
