@@ -6,6 +6,9 @@ import {
   parseISO,
   set,
   parse,
+  isSameDay,
+  isSameHour,
+  isSameMinute,
 } from "date-fns";
 import { isEqual } from "date-fns";
 import QueryBuilder from "../builder/QueryBuilder.js";
@@ -46,15 +49,20 @@ const sentReminder = async () => {
   console.log("clicked");
   const tasks = await userTasks.find({});
   const currentDate = new Date();
+  console.log("currentDate", currentDate);
   for (const task of tasks) {
     console.log(task);
-    if (isEqual(currentDate, task?.nextOccurrence)) {
+    if (
+      isSameDay(currentDate, task?.nextOccurrence) &&
+      isSameHour(currentDate, task?.nextOccurrence) &&
+      isSameMinute(currentDate, task?.nextOccurrence)
+    ) {
       console.log("corn jobs is working. thank you ");
     }
   }
 };
 
-const job = scheduleJob("*/5 8-22 * * *", sentReminder);
+const job = scheduleJob("*/1 8-22 * * *", sentReminder);
 // job();
 const userTaskServices = {
   insertUserTaskIntoDB,
