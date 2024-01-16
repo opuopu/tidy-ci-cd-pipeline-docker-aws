@@ -7,8 +7,10 @@ import {
   set,
   parse,
 } from "date-fns";
+import { isEqual } from "date-fns";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import userTasks from "../models/userTask.model.js";
+import { scheduleJob } from "node-schedule";
 
 const insertUserTaskIntoDB = async (paylaod) => {
   const result = await userTasks.create(paylaod);
@@ -40,6 +42,20 @@ const deleteTask = async (id) => {
   return result;
 };
 
+const sentReminder = async () => {
+  console.log("clicked");
+  const tasks = await userTasks.find({});
+  const currentDate = new Date();
+  for (const task of tasks) {
+    console.log(task);
+    if (isEqual(currentDate, task?.nextOccurrence)) {
+      console.log("corn jobs is working. thank you ");
+    }
+  }
+};
+
+const job = scheduleJob("*/5 8-22 * * *", sentReminder);
+// job();
 const userTaskServices = {
   insertUserTaskIntoDB,
   getAllUserTaskByQuery,
