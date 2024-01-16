@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-const {
+import {
   addDays,
   addWeeks,
   addMonths,
@@ -7,7 +7,7 @@ const {
   parseISO,
   set,
   parse,
-} = require("date-fns");
+} from "date-fns";
 const userTasksSchema = new Schema(
   {
     title: {
@@ -25,15 +25,14 @@ const userTasksSchema = new Schema(
         ref: "Employee",
       },
     ],
-    rooms: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Room",
-        required: [true, "room is required"],
-      },
-    ],
+    room: {
+      type: Schema.Types.ObjectId,
+      ref: "Room",
+      required: [true, "room is required"],
+    },
+
     date: {
-      type: Date,
+      type: String,
       required: [true, "task date is required"],
     },
     time: {
@@ -48,6 +47,9 @@ const userTasksSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    nextOccurrence: {
+      type: Date,
+    },
   },
 
   {
@@ -55,27 +57,32 @@ const userTasksSchema = new Schema(
   }
 );
 
-userTasksSchema.statics.calculateNextOccurence = async function () {
-  const task = await userTasks.findOne({});
-  const userChoosenDate = parseISO(task?.date);
-  const userChosenTime = parse(task?.time, "h:mm a", new Date());
+userTasksSchema.pre("save", async function (next) {
+  console.log(this);
+  const userChoosenDate = parseISO(this.date);
+  const userChosenTime = parse(this?.time, "hh:mm a", new Date());
+  console.log("User Chosen Time:", userChosenTime);
   const combineDateandTime = set(userChoosenDate, {
     hours: userChosenTime.getHours(),
     minutes: userChosenTime.getMinutes(),
-    seconds: userChoosenDate.getSeconds(),
+    seconds: userChosenTime.getSeconds(),
   });
-  switch (task?.repeat) {
+  console.log(combineDateandTime);
+  switch (this?.repeat) {
     case "daily":
-      return addDays(combineDateandTime, 1);
+      this.nextOccurrence = addDays(combineDateandTime, 1);
+      break;
     case "weekly":
-      return addWeeks(combineDateandTime, 1);
+      this.nextOccurrence = addWeeks(combineDateandTime, 1);
+      break;
     case "monthly":
-      return addMonths(combineDateandTime, 1);
-
+      this.nextOccurrence = addMonths(combineDateandTime, 1);
+      break;
     default:
-      return null;
+      this.nextOccurrence = null;
   }
-};
+  next();
+});
 
 const userTasks = model("userTask", userTasksSchema);
 export default userTasks;
