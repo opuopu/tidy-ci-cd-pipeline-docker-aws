@@ -1,3 +1,12 @@
+import {
+  addDays,
+  addWeeks,
+  addMonths,
+  isAfter,
+  parseISO,
+  set,
+  parse,
+} from "date-fns";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import userTasks from "../models/userTask.model.js";
 
@@ -31,4 +40,10 @@ const deleteTask = async (id) => {
   return result;
 };
 
-const jobs = () => {};
+const userTaskServices = {
+  insertUserTaskIntoDB,
+  getAllUserTaskByQuery,
+  getSingleTask,
+  deleteTask,
+};
+export default userTaskServices;
