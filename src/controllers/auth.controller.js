@@ -8,7 +8,7 @@ const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "user Sign up successfully",
+    message: "please verify your otp now",
     data: result,
   });
 });

@@ -5,22 +5,18 @@ import sendEmail from "../utils/sendEmail.js";
 import bcrypt from "bcrypt";
 import config from "../config/index.js";
 import { User } from "../models/user.model.js";
-
 import mongoose from "mongoose";
+import { generateOtp } from "../utils/OtpGenerator.js";
 const createAnOtpIntoDB = async (email, type) => {
-  const otp = Math.floor(100000 + Math.random() * 900000);
+  const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 3600000);
-  const decryptOtp = await bcrypt.hash(
-    otp.toString(),
-    Number(config.bcrypt_salt_rounds)
-  );
+  const decryptOtp = await bcrypt.hash(otp, Number(config.bcrypt_salt_rounds));
   const otpObj = {
     email,
     type,
     otp: decryptOtp,
     expiresAt,
   };
-  console.log(otpObj);
   const result = await Otp.create(otpObj);
   if (!result) {
     throw new AppError(
@@ -39,9 +35,7 @@ const createAnOtpIntoDB = async (email, type) => {
 };
 const verifyOtp = async (email, payload) => {
   const { verificationCode, type } = payload;
-
   const isExistOtp = await Otp.isExistOtp(email, type);
-
   if (!isExistOtp) {
     throw new AppError(
       httpStatus.NOT_FOUND,

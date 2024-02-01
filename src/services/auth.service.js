@@ -15,9 +15,7 @@ import HomeOwner from "../models/homeOwner.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
-  console.log(email);
   const user = await User.isUserExist(email);
-
   if (user && user?.verified) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -33,7 +31,6 @@ const signupHomeOwnerIntoDB = async (payload) => {
         { email: email },
         { session }
       );
-      console.log(deleteUser);
       if (!deleteUser) {
         throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
       }
