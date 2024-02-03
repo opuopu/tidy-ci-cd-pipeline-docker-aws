@@ -33,29 +33,22 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const result = await authServices.forgotPassword(req.body.email);
+  const result = await authServices.forgotPassword(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "otp send successfully. please check your email",
-    data: result ? result : null,
-  });
-});
-const updatePassword = catchAsync(async (req, res) => {
-  const result = await authServices.updatePassword(req.params.email, req.body);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "password update successfully!",
+    message: "Password Updated succesfully",
     data: result,
   });
 });
+
 const resetPassword = catchAsync(async (req, res) => {
-  const result = await authServices.resetPassword(req.params.id, req.body);
+  const { userId } = req.user;
+  const result = await authServices.resetPassword(userId, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "password reset successfully!",
+    message: "Password Updated succesfully",
     data: result,
   });
 });
@@ -64,7 +57,6 @@ const authControllers = {
   signIn,
   refreshToken,
   forgotPassword,
-  updatePassword,
   resetPassword,
 };
 export default authControllers;

@@ -13,10 +13,9 @@ router.post(
   authControllers.signIn
 );
 router.post("/refreshToken", authControllers.refreshToken);
-router.post("/forgotPassword", authControllers.forgotPassword);
-router.patch("/updatePassword/:email", authControllers.updatePassword);
+router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
-  "/resetPassword/:id",
+  "/resetPassword",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   authControllers.resetPassword
 );

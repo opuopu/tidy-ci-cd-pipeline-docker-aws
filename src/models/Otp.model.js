@@ -22,7 +22,7 @@ const otpSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["forgotPassword", "signupVerification"],
+      enum: ["forgotPassWordVerification", "signupVerification"],
     },
   },
   {
