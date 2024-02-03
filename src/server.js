@@ -1,19 +1,26 @@
 import mongoose from "mongoose";
 import app from "./app.js";
-
+import { createServer } from "http";
 import infoLogger from "./Logger/InfoLogger.js";
 import errorLoger from "./Logger/errorLoger.js";
 import config from "./config/index.js";
-let server;
+import configureSocketIO from "./utils/socketIo.js";
+import { Server } from "socket.io";
+import initializeSocketIO from "./utils/socketIo.js";
 
+const server = createServer(app);
+export const io = initializeSocketIO(server);
 async function main() {
   try {
     await mongoose.connect(config.database_url);
-    server = app.listen(config.port, config.ip, () => {
+    app.listen(config.port, config.ip, () => {
       console.log(`app is listening on port ${config.port}`);
       infoLogger.info(
         `Server is running at http://${config.ip}:${config.port}`
       );
+    });
+    server.listen(config.socket_port, config.ip, () => {
+      console.log(`socker server listening on port ${config?.socket_port}`);
     });
   } catch (error) {
     console.log(error);
