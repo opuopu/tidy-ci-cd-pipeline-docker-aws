@@ -4,9 +4,8 @@ import { createServer } from "http";
 import infoLogger from "./Logger/InfoLogger.js";
 import errorLoger from "./Logger/errorLoger.js";
 import config from "./config/index.js";
-import configureSocketIO from "./utils/socketIo.js";
-import { Server } from "socket.io";
-import initializeSocketIO from "./utils/socketIo.js";
+
+import initializeSocketIO from "./socketIo.js";
 
 const server = createServer(app);
 export const io = initializeSocketIO(server);
