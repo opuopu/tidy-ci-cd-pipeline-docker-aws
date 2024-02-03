@@ -72,7 +72,7 @@ const signupHomeOwnerIntoDB = async (payload) => {
   }
 
   setTimeout(async () => {
-    await otpServices.createAnOtpIntoDB(email, "signupVerification");
+    await otpServices.createAnOtpIntoDB({ email, type: "signupVerification" });
   }, 1000);
   return result[0];
 };
