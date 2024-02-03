@@ -58,11 +58,13 @@ const sentReminder = async () => {
       isSameMinute(currentDate, task?.nextOccurrence)
     ) {
       console.log("corn jobs is working. thank you ");
+      // here i use socket io for push notification
+      // update nextoccurrence field into database
     }
   }
 };
 
-const job = scheduleJob("*/1 8-22 * * *", sentReminder);
+//  scheduleJob("*/1 8-22 * * *", sentReminder);
 // job();
 const userTaskServices = {
   insertUserTaskIntoDB,

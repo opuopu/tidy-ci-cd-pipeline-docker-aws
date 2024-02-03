@@ -6,17 +6,16 @@ import validateRequest from "../middlewares/validateRequest.js";
 import authValidation from "../validation/auth.validation.js";
 const router = express.Router();
 
-router.post("/create-homeowner", authControllers.signupHomeOwnerIntoDB);
+router.post("/signup", authControllers.signupHomeOwnerIntoDB);
 router.post(
   "/signin",
   validateRequest(authValidation.singinSchema),
   authControllers.signIn
 );
 router.post("/refreshToken", authControllers.refreshToken);
-router.post("/forgotPassword", authControllers.forgotPassword);
-router.patch("/updatePassword/:email", authControllers.updatePassword);
+router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
-  "/resetPassword/:id",
+  "/resetPassword",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   authControllers.resetPassword
 );

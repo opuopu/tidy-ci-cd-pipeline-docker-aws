@@ -22,7 +22,7 @@ const otpSchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["forgotPassword", "signupVerification"],
+      enum: ["forgotPassWordVerification", "signupVerification"],
     },
   },
   {
@@ -39,16 +39,8 @@ otpSchema.statics.isExistOtp = async function (email, type) {
   });
   return isExistOtp;
 };
-otpSchema.statics.isOtpExpired = async function (email, type) {
-  const isOtpExpired = await Otp.findOne({
-    $and: [
-      { email: email },
-      { type: type },
-      { $expr: { $lt: ["$expiresAt", new Date()] } },
-    ],
-  });
-
-  return isOtpExpired ? true : false;
+otpSchema.statics.isOtpExpired = async function (expiresAt) {
+  return expiresAt < new Date() ? true : false;
 };
 otpSchema.statics.deleteOtp = async function (email, type, expiresAt) {
   return await Otp.deleteOne({

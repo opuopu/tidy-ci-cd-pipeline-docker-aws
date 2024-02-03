@@ -11,13 +11,12 @@ import {
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
+import bcrypt from "bcrypt";
 
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
-  console.log(email);
   const user = await User.isUserExist(email);
-
   if (user && user?.verified) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -33,7 +32,6 @@ const signupHomeOwnerIntoDB = async (payload) => {
         { email: email },
         { session }
       );
-      console.log(deleteUser);
       if (!deleteUser) {
         throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
       }
@@ -66,6 +64,12 @@ const signupHomeOwnerIntoDB = async (payload) => {
       refferalCode: generateRefferalCode(),
     };
     result = await HomeOwner.create([finalObj], { session });
+    setTimeout(async () => {
+      await otpServices.createAnOtpIntoDB({
+        email,
+        type: "signupVerification",
+      });
+    }, 1000);
     await session.commitTransaction();
     await session.endSession();
   } catch (err) {
@@ -74,9 +78,6 @@ const signupHomeOwnerIntoDB = async (payload) => {
     throw new Error(err);
   }
 
-  setTimeout(async () => {
-    await otpServices.createAnOtpIntoDB(email, "signupVerification");
-  }, 1000);
   return result[0];
 };
 
@@ -144,74 +145,96 @@ const refreshToken = async (token) => {
   };
 };
 
-const forgotPassword = async (email) => {
+const forgotPassword = async ({ otp, email, password }) => {
+  // check if user exist
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email");
   }
-  await otpServices.createAnOtpIntoDB(email, "forgotPassword");
-};
-
-const updatePassword = async (email, payload) => {
-  const { password } = payload;
-  const isUserExist = await User.isUserExist(email);
-  if (!isUserExist) {
+  // check is otp exist
+  const isOtpExist = await Otp.isExistOtp(email, "forgotPassWordVerification");
+  if (!isOtpExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "user not exist with this email. please check your email again!"
+      "Otp Information Not Found. Please Resend It"
     );
   }
-  const isOtpVerified = await Otp.findOne({
-    $and: [
-      { email: email },
-      { type: "forgotPassword" },
-      { verificationStatus: true },
-    ],
-  });
-  if (!isOtpVerified) {
+  // check is otp expires
+  const isOtpExpires = await Otp.isOtpExpired(isOtpExist?.expiresAt);
+  if (isOtpExpires) {
+    await Otp.findByIdAndDelete(isOtpExist?._id);
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "something went wrong. please send otp again!"
+      "OTP has expired. Please request a new one and try again"
     );
   }
-  isUserExist.password = password;
-  const result = await isUserExist.save();
-  if (result) {
-    await Otp.deleteOtp(email, isOtpVerified?.type, isOtpVerified?.expiresAt);
+  // check is otp matched
+  const isOtpMatched = await Otp.isOtpMatched(otp, isOtpExist?.otp);
+  if (!isOtpMatched) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
   }
+  const hasedPassword = await bcrypt.hash(
+    password,
+    Number(config.bcrypt_salt_rounds)
+  );
+  let result;
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    result = await User.findByIdAndUpdate(
+      isUserExist?._id,
+      {
+        password: hasedPassword,
+        passwordChangedAt: new Date(),
+      },
+      { new: true, session }
+    );
+    if (result) {
+      await Otp.findByIdAndDelete(isOtpExist?._id, { session });
+    }
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+
   return result;
 };
 
 const resetPassword = async (id, payload) => {
   const { oldPassword, newPassword } = payload;
-  const isUserExist = await User.checkUserExistById(id);
-  console.log(isUserExist);
+  const isUserExist = await User.findByIdAndUpdate(id);
   if (!isUserExist) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "User not found. Please check the provided ID."
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, "User Information Not Found");
   }
 
-  const isPasswordMatched = await User.isPasswordMatched(
-    oldPassword,
-    isUserExist?.password
+  const isPasswordMatched = await bcrypt.compare(
+    isUserExist?.password,
+    oldPassword
   );
   if (!isPasswordMatched) {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      "Old password does not match Please verify and try again."
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, "Old Password Does Not Match");
   }
-  isUserExist.password = newPassword;
-  const result = await isUserExist.save();
+
+  const hashedPassword = bcrypt.hash(
+    newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+  const result = await User.findByIdAndUpdate(
+    id,
+    { password: hashedPassword, passwordChangedAt: new Date() },
+    { new: true }
+  );
+
   return result;
 };
+
 const authServices = {
   SignInUser,
   refreshToken,
   forgotPassword,
-  updatePassword,
   resetPassword,
   signupHomeOwnerIntoDB,
 };
