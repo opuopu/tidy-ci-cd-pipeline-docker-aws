@@ -6,7 +6,7 @@ const insertNotificationIntoDB = async (payload) => {
 };
 const getUserSpecificNotifications = async (userId) => {
   const query = {};
-  if (userId) query["receiverId"] = userId;
+  if (userId) query["receiver"] = userId;
   const notificationQuery = new QueryBuilder(Notification.find({}), query)
     .search()
     .filter()

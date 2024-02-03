@@ -13,6 +13,7 @@ import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
 import { io } from "../server.js";
+import notificationServices from "./notification.service.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -118,6 +119,12 @@ const SignInUser = async (payload) => {
     config.jwt_refresh_secret,
     config.jwt_refresh_expires_in
   );
+
+  const notificationObject = {
+    receiver: user?.id,
+    message: "wow signup successfully2",
+    type: "schedule",
+  };
 
   return {
     accessToken,

@@ -4,7 +4,10 @@ import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 
 const getUserSpecificNotifications = catchAsync(async (req, res) => {
-  const result = await notificationServices.getUserSpecificNotifications();
+  const { userId } = req.user;
+  const result = await notificationServices.getUserSpecificNotifications(
+    userId
+  );
   sendResponse(res, {
     status: httpStatus.OK,
     message: "notifications retrived successfully",
