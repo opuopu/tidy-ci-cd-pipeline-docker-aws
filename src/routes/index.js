@@ -15,6 +15,7 @@ import userGroceryListsRoutes from "./userGroceryList.route.js";
 import taskCategoryRoutes from "./taskCategory.route.js";
 import taskListRoutes from "./taskList.route.js";
 import userTasksRoutes from "./userTask.route.js";
+import notificationRoutes from "./notificationRoutes.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -80,6 +81,10 @@ const moduleRoutes = [
   {
     path: "/user-tasks",
     route: userTasksRoutes,
+  },
+  {
+    path: "/notifications",
+    route: notificationRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
