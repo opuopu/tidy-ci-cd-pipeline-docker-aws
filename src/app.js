@@ -5,11 +5,11 @@ import path, { dirname } from "path";
 import ApiNotFound from "./middlewares/NotFound.js";
 import cors from "cors";
 import globalErrorHandler from "./middlewares/GlobalErrorHanlder.js";
-
+import { createServer } from "http";
 import router from "./routes/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const app = express();
+export const app = express();
 // to access static images file from public directory
 app.use("/public", express.static(path.join(__dirname, "../public")));
 app.use(helmet());

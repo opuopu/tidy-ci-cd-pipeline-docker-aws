@@ -12,7 +12,7 @@ import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
-
+import { io } from "../server.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -80,7 +80,6 @@ const signupHomeOwnerIntoDB = async (payload) => {
 
   return result[0];
 };
-
 const SignInUser = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);
@@ -102,6 +101,7 @@ const SignInUser = async (payload) => {
       "please verify your account first!"
     );
   }
+
   const jwtPayload = {
     userId: user.id,
     email: user.email,
@@ -118,6 +118,7 @@ const SignInUser = async (payload) => {
     config.jwt_refresh_secret,
     config.jwt_refresh_expires_in
   );
+
   return {
     accessToken,
     refreshToken,
