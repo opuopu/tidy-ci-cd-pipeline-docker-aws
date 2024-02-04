@@ -14,6 +14,7 @@ import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
 import { io } from "../server.js";
 import notificationServices from "./notification.service.js";
+import Employee from "../models/employee.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -80,6 +81,11 @@ const signupHomeOwnerIntoDB = async (payload) => {
   }
 
   return result[0];
+};
+// signup employee
+const signupEmployeeIntoDb = async (payload) => {
+  const result = await Employee.create(payload);
+  return result;
 };
 const SignInUser = async (payload) => {
   const { email, password } = payload;
@@ -245,5 +251,6 @@ const authServices = {
   forgotPassword,
   resetPassword,
   signupHomeOwnerIntoDB,
+  signupEmployeeIntoDb,
 };
 export default authServices;

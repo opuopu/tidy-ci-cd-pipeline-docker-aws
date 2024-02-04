@@ -6,13 +6,6 @@ const employeeSchema = new Schema(
       type: String,
       required: [true, "employee name is required"],
     },
-    phone: {
-      type: Number,
-      required: [true, "employee phoneNumber is required"],
-    },
-    email: {
-      type: String,
-    },
     homeOwner: {
       type: Types.ObjectId,
       ref: "HomeOwner",

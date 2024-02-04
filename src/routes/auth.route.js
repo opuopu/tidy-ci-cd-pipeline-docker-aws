@@ -4,9 +4,18 @@ import auth from "../middlewares/auth.js";
 import { USER_ROLE } from "../constant/user.role.js";
 import validateRequest from "../middlewares/validateRequest.js";
 import authValidation from "../validation/auth.validation.js";
+import parseData from "../middlewares/parseData.js";
+import fileUpload from "../middlewares/fileUpload.js";
 const router = express.Router();
-
-router.post("/signup", authControllers.signupHomeOwnerIntoDB);
+const upload = fileUpload("./public/uploads/employee/");
+router.post("/homeOwner/signup", authControllers.signupHomeOwnerIntoDB);
+router.post(
+  "/employee/signup",
+  upload.single("file"),
+  parseData(),
+  auth(USER_ROLE.HOMEOWNER),
+  authControllers.signupEmployeeIntoDb
+);
 router.post(
   "/signin",
   validateRequest(authValidation.singinSchema),
