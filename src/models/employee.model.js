@@ -6,6 +6,13 @@ const employeeSchema = new Schema(
       type: String,
       required: [true, "employee name is required"],
     },
+    phone: {
+      type: Number,
+      required: [true, "employee phoneNumber is required"],
+    },
+    email: {
+      type: String,
+    },
     homeOwner: {
       type: Types.ObjectId,
       ref: "HomeOwner",
@@ -26,11 +33,29 @@ const employeeSchema = new Schema(
       expireDate: {
         type: Date,
       },
-      reminder: {
-        type: Boolean,
-        default: false,
+    },
+    passport: {
+      passportNumber: {
+        type: Number,
+      },
+      expireDate: {
+        type: Date,
       },
     },
+    password: {
+      type: String,
+      default: "123456",
+    },
+    passwordChangedAt: {
+      type: Date,
+    },
+    needPassWordChange: {
+      type: Boolean,
+      default: true,
+    },
+    // access:{
+
+    // }
   },
   {
     timestamps: true,
