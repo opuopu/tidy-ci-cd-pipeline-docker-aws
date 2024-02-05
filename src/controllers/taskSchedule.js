@@ -1,12 +1,15 @@
 import httpStatus from "http-status";
-import userTaskServices from "../services/userTask.service.js";
+
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
-
+import taskScheduleService from "../services/taskSchedule.service.js";
+import dayjs from "dayjs";
 const insertUserTaskIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.body.homeOwner = userId;
-  const result = await userTaskServices.insertUserTaskIntoDB(req.body);
+
+  req.body.date = dayjs(req?.body?.date).format("YYYY-MM-DD");
+  const result = await taskScheduleService.insertUserTaskIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -14,8 +17,7 @@ const insertUserTaskIntoDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
-const userTaskControllers = {
+const taskScheduleController = {
   insertUserTaskIntoDB,
 };
-export default userTaskControllers;
+export default taskScheduleController;

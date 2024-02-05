@@ -1,7 +1,8 @@
 import httpStatus from "http-status";
-import taskListServices from "../services/taskList.Service.js";
+
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
+import taskListServices from "../services/taskList.service.js";
 
 const insertTaskListIntoDB = catchAsync(async (req, res) => {
   // const { userId } = req?.user;
@@ -20,7 +21,8 @@ const getAllTaskList = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "task lists retrived successfully",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getSingleTask = catchAsync(async (req, res) => {

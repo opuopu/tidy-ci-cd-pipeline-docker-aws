@@ -16,6 +16,7 @@
     "bullmq": "^5.1.2",
     "cors": "^2.8.5",
     "date-fns": "^3.2.0",
+    "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.1.5",

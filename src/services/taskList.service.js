@@ -6,6 +6,7 @@ const insertTaskIntoDB = async (payload) => {
   return result;
 };
 
+// filter tasks by task category id
 const getAllTasks = async (query) => {
   const taskListModel = new QueryBuilder(
     TaskList.find().populate("category"),
@@ -28,6 +29,7 @@ const getSingleTask = async (id) => {
   const result = await TaskList.findById(id).populate("category");
   return result;
 };
+
 const taskListServices = {
   insertTaskIntoDB,
   getAllTasks,
