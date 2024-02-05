@@ -1,8 +1,9 @@
 import httpStatus from "http-status";
 import employeeServices from "../services/employee.service.js";
-import { createFileDetails } from "../utils/createFileDetails.utils.js";
+
 import sendResponse from "../utils/sendResponse.js";
 import catchAsync from "../utils/catchAsync.js";
+import { createFileDetails } from "../utils/file.utils.js";
 
 const getAllEmployees = catchAsync(async (req, res) => {
   const { userId } = req.user;

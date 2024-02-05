@@ -21,6 +21,10 @@ const userSchema = new Schema(
     passwordChangedAt: {
       type: Date,
     },
+    needPasswordChange: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: ["homeowner", "employee"],

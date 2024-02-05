@@ -11,6 +11,11 @@ const employeeSchema = new Schema(
       ref: "HomeOwner",
       required: [true, "homeOwner inforamtion is required"],
     },
+    user: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: [true, "user inforamtion is required"],
+    },
     image: {
       publicUrl: {
         type: String,
@@ -35,17 +40,7 @@ const employeeSchema = new Schema(
         type: Date,
       },
     },
-    password: {
-      type: String,
-      default: "123456",
-    },
-    passwordChangedAt: {
-      type: Date,
-    },
-    needPassWordChange: {
-      type: Boolean,
-      default: true,
-    },
+
     // access:{
 
     // }

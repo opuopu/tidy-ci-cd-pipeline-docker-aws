@@ -4,66 +4,92 @@ import { User } from "../models/user.model.js";
 import mongoose from "mongoose";
 import HomeOwner from "../models/homeOwner.model.js";
 import { deleteFile } from "../utils/file.utils.js";
+import Employee from "../models/employee.model.js";
 const getme = async (userId, role) => {
   let result;
   if (role === "homeOwner") {
     result = await HomeOwner.findOne({ user: userId }).populate("user");
   } else if (role === "employee") {
-    result = await HomeOwner.findOne({ user: userId }).populate("user");
+    result = await Employee.findOne({ user: userId }).populate("user");
   }
 
   return result;
 };
-
-const updateMyProfile = async (userId, role, file, payload) => {
-  const { password, role: clientRole, phoneNumber, email } = payload;
-  if (file) {
-    payload.profileImage = file;
-  }
+// update user profile
+const updateMyProfile = async (userId, role, payload) => {
+  const { password, role: clientRole, phoneNumber, email, ...others } = payload;
+  console.log(payload, userId);
+  const authObj = {
+    email,
+    phoneNumber,
+  };
   if (password || clientRole) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "something went wrong. please try again later"
     );
   }
-  const findFilePath = await HomeOwner.findOne({ user: userId });
-  if (findFilePath && findFilePath.profileImage?.path) {
-    await deleteFile(findFilePath.profileImage?.path);
+  let findFilePath;
+  if (role === "homeowner") {
+    findFilePath = await HomeOwner.findOne({ user: userId });
+  } else if (role === "employee") {
+    console.log("hitted");
+    findFilePath = await Employee.findOne({ user: userId });
   }
   const session = await mongoose.startSession();
   let result;
-
   try {
     session.startTransaction();
+    if (role === "homeowner") {
+      const updateUser = await User.findByIdAndUpdate(userId, authObj, {
+        new: true,
+        session,
+      });
+      if (!updateUser) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Failed to Update User");
+      }
+      result = await HomeOwner.findOneAndUpdate({ user: userId }, others, {
+        new: true,
+        session,
+      }).populate("user");
+      if (!result) {
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          "Failed to Update homeOwner"
+        );
+      }
+      if (payload?.image && findFilePath?.image?.path) {
+        await deleteFile(findFilePath.image?.path);
+      }
+    } else if (role === "employee") {
+      const updateUser = await User.findByIdAndUpdate(userId, authObj, {
+        new: true,
+        session,
+      });
 
-    let updateAuthInformation;
-    if (phoneNumber || email) {
-      updateAuthInformation = await User.findByIdAndUpdate(
-        userId,
-        {
-          $set: {
-            email: email,
-            phoneNumber: phoneNumber,
-          },
-        },
-        { session }
-      );
-      if (!updateAuthInformation) {
-        throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
+      if (!updateUser) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Failed to Update User");
+      }
+      result = await Employee.findOneAndUpdate({ user: userId }, others, {
+        new: true,
+        session,
+      }).populate("user");
+      if (!result) {
+        throw new AppError(httpStatus.BAD_REQUEST, "Failed to Update emplooye");
+      }
+      if (payload?.image && findFilePath?.image?.path) {
+        await deleteFile(findFilePath.image?.path);
       }
     }
-    result = await HomeOwner.findOneAndUpdate({ user: userId }, payload, {
-      new: true,
-      session,
-    });
+
     await session.commitTransaction();
     await session.endSession();
-  } catch (error) {
+    return result;
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
     throw new Error(err);
   }
-  return result;
 };
 const userServices = {
   getme,

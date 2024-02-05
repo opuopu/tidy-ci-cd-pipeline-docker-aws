@@ -84,8 +84,51 @@ const signupHomeOwnerIntoDB = async (payload) => {
 };
 // signup employee
 const signupEmployeeIntoDb = async (payload) => {
-  const result = await Employee.create(payload);
-  return result;
+  const { email, password, phoneNumber, needPasswordChange, ...others } =
+    payload;
+  const authObj = {
+    email,
+    password,
+    phoneNumber,
+    needPasswordChange: true,
+    role: "employee",
+    verified: true,
+  };
+  const user = await User.isUserExist(email);
+  if (user) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Employee already exist with the same email!"
+    );
+  }
+  const session = await mongoose.startSession();
+  let result;
+  try {
+    session.startTransaction();
+    result = await User.create([authObj], { session });
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Somethign Went Wrong");
+    }
+    const insertEmployeeDetails = await Employee.create(
+      [
+        {
+          ...others,
+          user: result[0]?._id,
+        },
+      ],
+      { session }
+    );
+    if (!insertEmployeeDetails) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Somethign Went Wrong");
+    }
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+  return result[0];
 };
 const SignInUser = async (payload) => {
   const { email, password } = payload;
@@ -125,12 +168,6 @@ const SignInUser = async (payload) => {
     config.jwt_refresh_secret,
     config.jwt_refresh_expires_in
   );
-
-  const notificationObject = {
-    receiver: user?.id,
-    message: "wow signup successfully2",
-    type: "schedule",
-  };
 
   return {
     accessToken,
