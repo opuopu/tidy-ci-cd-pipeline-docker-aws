@@ -23,12 +23,10 @@ import {
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 const insertUserTaskIntoDB = async (payload) => {
-  const { employees } = payload;
+  const { employee } = payload;
 
   const oldSchedule = await TaskSchedule.find({
-    employees: {
-      $in: employees,
-    },
+    employee,
   }).select("date startTime endTime recurrence");
   const newSchedule = {
     date: payload?.date,
@@ -56,8 +54,11 @@ const insertUserTaskIntoDB = async (payload) => {
   const result = await TaskSchedule.create(payload);
   return result;
 };
-const getAllUserTaskByQuery = async (query) => {
-  const userTaskModel = new QueryBuilder(TaskSchedule.find(), query)
+const getAllTaskSchedule = async (query) => {
+  const userTaskModel = new QueryBuilder(
+    TaskSchedule.find({}).populate("groceries"),
+    query
+  )
     .search()
     .filter()
     .paginate()
@@ -73,7 +74,64 @@ const getAllUserTaskByQuery = async (query) => {
 };
 
 const getSingleTask = async (id) => {
-  const result = await TaskSchedule.findById(id);
+  const result = await TaskSchedule.findById(id).populate(
+    "employees room groceries homeOwner"
+  );
+  return result;
+};
+
+const reAssignTask = async (id, payload) => {
+  const { employee, date, startTime, endTime } = payload;
+  if (!employee || !date || !startTime || !endTime) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Please Provide employee & date and time information"
+    );
+  }
+  const oldSchedule = await TaskSchedule.find({
+    employee,
+  }).select("date startTime endTime recurrence");
+  console.log(oldSchedule);
+  const newSchedule = {
+    date: payload?.date,
+    startTime: payload?.startTime,
+    endTime: payload?.endTime,
+    recurrence: payload?.recurrence,
+  };
+  // check same date same time conflict issue
+  if (hasDateAndTimeConflict(oldSchedule, newSchedule)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "date and time conflict! Employee is already scheduled during this date and time."
+    );
+  }
+
+  // check same time and reccurence conflict issue
+  if (hasRecurrenceConflict(oldSchedule, newSchedule)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "reccurence conflict! Employee is already scheduled during this time and reccurence."
+    );
+  }
+  const result = await TaskSchedule.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+const changeTaskStatus = async (id, payload) => {
+  const result = await TaskSchedule.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        status: payload?.status,
+        reason: payload?.reason,
+        note: payload?.note,
+      },
+    },
+    {
+      new: true,
+    }
+  );
   return result;
 };
 
@@ -81,7 +139,30 @@ const deleteTask = async (id) => {
   const result = await TaskSchedule.findByIdAndDelete(id);
   return result;
 };
-
+const addGroceriesIntoTask = async (id, payload) => {
+  const result = await TaskSchedule.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: {
+        groceries: { $each: payload?.groceries },
+      },
+    },
+    { new: true }
+  );
+  return result;
+};
+const removeGroceriesFromTask = async (id, payload) => {
+  const result = await TaskSchedule.findByIdAndUpdate(
+    id,
+    {
+      $pull: {
+        groceries: payload?.groceries,
+      },
+    },
+    { new: true }
+  );
+  return result;
+};
 const sentReminder = async () => {
   console.log("clicked");
   const tasks = await TaskSchedule.find({});
@@ -105,8 +186,12 @@ const sentReminder = async () => {
 // job();
 const taskScheduleService = {
   insertUserTaskIntoDB,
-  getAllUserTaskByQuery,
+  getAllTaskSchedule,
   getSingleTask,
+  reAssignTask,
+  addGroceriesIntoTask,
+  removeGroceriesFromTask,
+  changeTaskStatus,
   deleteTask,
 };
 export default taskScheduleService;

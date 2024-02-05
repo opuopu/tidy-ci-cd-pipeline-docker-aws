@@ -10,21 +10,25 @@ import {
 } from "date-fns";
 const TaskScheduleSchema = new Schema(
   {
-    title: {
+    task: {
       type: String,
-      required: [true, "task title is required"],
     },
+    groceries: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "GroceryList",
+      },
+    ],
     homeOwner: {
       type: Schema.Types.ObjectId,
       ref: "homeOwner",
       required: [true, "homeowner information is required"],
     },
-    employees: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Employee",
-      },
-    ],
+    employee: {
+      type: Schema.Types.ObjectId,
+      ref: "Employee",
+    },
+
     room: {
       type: Schema.Types.ObjectId,
       ref: "Room",
@@ -59,6 +63,12 @@ const TaskScheduleSchema = new Schema(
       type: String,
       enum: ["pending", "onGoing", "completed", "busy"],
       default: "pending",
+    },
+    reason: {
+      type: String,
+    },
+    note: {
+      type: String,
     },
     nextOccurrence: {
       type: Date,
