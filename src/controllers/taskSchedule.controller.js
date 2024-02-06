@@ -61,6 +61,7 @@ const changeTaskStatus = catchAsync(async (req, res) => {
   });
 });
 const reAssignTask = catchAsync(async (req, res) => {
+  req.body.date = dayjs(req?.body?.date).format("YYYY-MM-DD");
   const result = await taskScheduleService.reAssignTask(
     req.params.id,
     req.body
@@ -68,7 +69,7 @@ const reAssignTask = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "task reasigned  successfully",
+    message: "task re asigned  successfully",
     data: result,
   });
 });
@@ -84,6 +85,15 @@ const removeGroceriesFromTask = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const updateTaskSchedule = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.updateTask(req.params.id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "task schedule updated successfully",
+    data: result,
+  });
+});
 const taskScheduleController = {
   insertUserTaskIntoDB,
   getAllTaskSchedule,
@@ -92,5 +102,6 @@ const taskScheduleController = {
   removeGroceriesFromTask,
   changeTaskStatus,
   reAssignTask,
+  updateTaskSchedule,
 };
 export default taskScheduleController;

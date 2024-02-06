@@ -21,6 +21,11 @@ router.get(
   taskScheduleController.getAllTaskSchedule
 );
 router.patch(
+  "/:id",
+  auth(USER_ROLE.HOMEOWNER),
+  taskScheduleController.updateTaskSchedule
+);
+router.patch(
   "/add-groceries/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   taskScheduleController.addGroceriesIntoTask

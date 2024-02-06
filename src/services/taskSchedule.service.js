@@ -19,12 +19,13 @@ import {
   hasDateAndTimeConflict,
   hasRecurrenceConflict,
   hasTimeConflict,
+  nextDayAndTime,
 } from "../utils/schedule.utils.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
+import dayjs from "dayjs";
 const insertUserTaskIntoDB = async (payload) => {
   const { employee } = payload;
-
   const oldSchedule = await TaskSchedule.find({
     employee,
   }).select("date startTime endTime recurrence");
@@ -36,12 +37,12 @@ const insertUserTaskIntoDB = async (payload) => {
   };
   // check same date same time conflict issue
   if (hasDateAndTimeConflict(oldSchedule, newSchedule)) {
+    console.log("clicked");
     throw new AppError(
       httpStatus.CONFLICT,
       "date and time conflict! Employee is already scheduled during this date and time."
     );
   }
-
   // check same time and reccurence conflict issue
   if (hasRecurrenceConflict(oldSchedule, newSchedule)) {
     throw new AppError(
@@ -50,7 +51,6 @@ const insertUserTaskIntoDB = async (payload) => {
     );
   }
   // check only time conflict issue
-
   const result = await TaskSchedule.create(payload);
   return result;
 };
@@ -72,17 +72,15 @@ const getAllTaskSchedule = async (query) => {
     result,
   };
 };
-
 const getSingleTask = async (id) => {
   const result = await TaskSchedule.findById(id).populate(
     "employees room groceries homeOwner"
   );
   return result;
 };
-
 const reAssignTask = async (id, payload) => {
-  const { employee, date, startTime, endTime } = payload;
-  if (!employee || !date || !startTime || !endTime) {
+  const { employee, date, startTime, endTime, recurrence } = payload;
+  if (!employee || !date || !startTime || !endTime || !recurrence) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Please Provide employee & date and time information"
@@ -91,7 +89,6 @@ const reAssignTask = async (id, payload) => {
   const oldSchedule = await TaskSchedule.find({
     employee,
   }).select("date startTime endTime recurrence");
-  console.log(oldSchedule);
   const newSchedule = {
     date: payload?.date,
     startTime: payload?.startTime,
@@ -105,8 +102,7 @@ const reAssignTask = async (id, payload) => {
       "date and time conflict! Employee is already scheduled during this date and time."
     );
   }
-
-  // check same time and reccurence conflict issue
+  // // check same time and reccurence conflict issue
   if (hasRecurrenceConflict(oldSchedule, newSchedule)) {
     throw new AppError(
       httpStatus.CONFLICT,
@@ -131,6 +127,19 @@ const changeTaskStatus = async (id, payload) => {
     {
       new: true,
     }
+  );
+  return result;
+};
+const updateTask = async (id, payload) => {
+  const result = await TaskSchedule.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        task: payload?.task,
+        reminder: payload?.reminder,
+      },
+    },
+    { new: true }
   );
   return result;
 };
@@ -193,5 +202,6 @@ const taskScheduleService = {
   removeGroceriesFromTask,
   changeTaskStatus,
   deleteTask,
+  updateTask,
 };
 export default taskScheduleService;

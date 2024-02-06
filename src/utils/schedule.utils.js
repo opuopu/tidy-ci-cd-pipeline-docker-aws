@@ -1,4 +1,7 @@
+import { addDays, addMonths, addWeeks, nextDay, parseISO } from "date-fns";
+
 export const hasDateAndTimeConflict = (assignSchedules, newSchedules) => {
+  console.log("goignh", assignSchedules, newSchedules);
   for (const schedule of assignSchedules) {
     const existingStartTime = new Date(
       `${schedule.date}T${schedule.startTime}`
@@ -44,6 +47,20 @@ export const hasRecurrenceConflict = (assignSchedules, newSchedule) => {
     }
   }
   return false;
+};
+
+export const nextDayAndTime = (date, time) => {
+  console.log(time);
+  const combinedDateTimeString = `${date}T${time}:00`;
+  return addDays(new Date(combinedDateTimeString), 1);
+};
+export const nextWeekDateAndTime = (date, time) => {
+  const combinedDateTimeString = `${date}T${time}:00`;
+  return addWeeks(parseISO(combinedDateTimeString), 1);
+};
+export const nextMonthDateAndTime = (date, time) => {
+  const combinedDateTimeString = `${date}T${time}:00`;
+  return addMonths(combinedDateTimeString, 1);
 };
 
 // Sat | Sun  | Mon | Tue | Wed | Tue | Wed |Thu | Fri

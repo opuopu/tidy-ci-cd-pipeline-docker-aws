@@ -66,6 +66,7 @@ const TaskScheduleSchema = new Schema(
     },
     reason: {
       type: String,
+      enum: ["sick", "busy", "personal_reason", "other"],
     },
     note: {
       type: String,
