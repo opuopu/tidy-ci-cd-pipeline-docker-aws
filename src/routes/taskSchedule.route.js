@@ -45,6 +45,11 @@ router.patch(
   auth(USER_ROLE.HOMEOWNER),
   taskScheduleController.reAssignTask
 );
+router.post(
+  "/schedule",
+  auth(USER_ROLE.HOMEOWNER),
+  taskScheduleController.scheduleTask
+);
 
 const taskScheduleRoutes = router;
 export default taskScheduleRoutes;

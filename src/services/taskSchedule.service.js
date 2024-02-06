@@ -1,29 +1,24 @@
 import {
-  addDays,
-  addWeeks,
-  addMonths,
-  isAfter,
-  parseISO,
-  set,
-  parse,
   isSameDay,
   isSameHour,
   isSameMinute,
+  addMinutes,
+  format,
 } from "date-fns";
-import { isEqual } from "date-fns";
+
 import QueryBuilder from "../builder/QueryBuilder.js";
 
-import { scheduleJob } from "node-schedule";
 import TaskSchedule from "../models/taskSchedule.model.js";
 import {
+  getNextOccurrence,
   hasDateAndTimeConflict,
   hasRecurrenceConflict,
-  hasTimeConflict,
-  nextDayAndTime,
 } from "../utils/schedule.utils.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
-import dayjs from "dayjs";
+import Notification from "../models/notification.model.js";
+import { emitMessage } from "../utils/socket.utils.js";
+import schedule from "node-schedule";
 const insertUserTaskIntoDB = async (payload) => {
   const { employee } = payload;
   const oldSchedule = await TaskSchedule.find({
@@ -51,7 +46,10 @@ const insertUserTaskIntoDB = async (payload) => {
     );
   }
   // check only time conflict issue
-  const result = await TaskSchedule.create(payload);
+  const result = await TaskSchedule.create({
+    ...payload,
+    nextOccurrence: new Date(`${payload?.date}T${payload?.startTime}`),
+  });
   return result;
 };
 const getAllTaskSchedule = async (query) => {
@@ -109,9 +107,16 @@ const reAssignTask = async (id, payload) => {
       "reccurence conflict! Employee is already scheduled during this time and reccurence."
     );
   }
-  const result = await TaskSchedule.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
+  const result = await TaskSchedule.findByIdAndUpdate(
+    id,
+    {
+      ...payload,
+      nextOccurrence: new Date(`${payload?.date}T${payload?.startTime}`),
+    },
+    {
+      new: true,
+    }
+  );
   return result;
 };
 const changeTaskStatus = async (id, payload) => {
@@ -173,25 +178,43 @@ const removeGroceriesFromTask = async (id, payload) => {
   return result;
 };
 const sentReminder = async () => {
-  console.log("clicked");
-  const tasks = await TaskSchedule.find({});
-  const currentDate = new Date();
-  console.log("currentDate", currentDate);
+  const date = new Date();
+  const currentDate = addMinutes(date, 5);
+  const formatedTime = format(currentDate, "HH:mm");
+  const tasks = await TaskSchedule.aggregate([
+    { $match: { startTime: formatedTime } },
+    {
+      $group: {
+        _id: "$employee",
+      },
+    },
+  ]);
+  console.log(tasks);
+  const uniqueEmployeeMessage = new Set();
   for (const task of tasks) {
-    console.log(task);
+    const handleNextOccurrence = getNextOccurrence(task);
     if (
-      isSameDay(currentDate, task?.nextOccurrence) &&
-      isSameHour(currentDate, task?.nextOccurrence) &&
-      isSameMinute(currentDate, task?.nextOccurrence)
+      isSameDay(date, handleNextOccurrence) &&
+      isSameHour(date, handleNextOccurrence) &&
+      isSameMinute(date, handleNextOccurrence)
     ) {
-      console.log("corn jobs is working. thank you ");
-      // here i use socket io for push notification
-      // update nextoccurrence field into database
+      const notification = await Notification.create({
+        receiver: task?.employee,
+        message: "your task is arrived",
+        type: "schedule",
+      });
+      if (notification) {
+        uniqueEmployeeMessage.add(notification?.message);
+      }
     }
   }
+  uniqueEmployeeMessage.forEach((message) => {
+    emitMessage("schedule", message);
+  });
+  uniqueEmployeeMessage.clear();
 };
+// schedule.scheduleJob("*/25 * * * *", sentReminder);
 
-//  scheduleJob("*/1 8-22 * * *", sentReminder);
 // job();
 const taskScheduleService = {
   insertUserTaskIntoDB,
@@ -203,5 +226,6 @@ const taskScheduleService = {
   changeTaskStatus,
   deleteTask,
   updateTask,
+  sentReminder,
 };
 export default taskScheduleService;

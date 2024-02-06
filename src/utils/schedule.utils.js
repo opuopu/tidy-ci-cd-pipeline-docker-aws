@@ -50,17 +50,30 @@ export const hasRecurrenceConflict = (assignSchedules, newSchedule) => {
 };
 
 export const nextDayAndTime = (date, time) => {
-  console.log(time);
-  const combinedDateTimeString = `${date}T${time}:00`;
-  return addDays(new Date(combinedDateTimeString), 1);
+  const combinedDateTimeString = new Date(`${date}T${time}`);
+  return addDays(combinedDateTimeString, 1);
 };
 export const nextWeekDateAndTime = (date, time) => {
-  const combinedDateTimeString = `${date}T${time}:00`;
-  return addWeeks(parseISO(combinedDateTimeString), 1);
+  const combinedDateTimeString = new Date(`${date}T${time}`);
+  return addWeeks(combinedDateTimeString, 1);
 };
 export const nextMonthDateAndTime = (date, time) => {
-  const combinedDateTimeString = `${date}T${time}:00`;
+  const combinedDateTimeString = new Date(`${date}T${time}`);
   return addMonths(combinedDateTimeString, 1);
+};
+
+export const getNextOccurrence = (task) => {
+  switch (task?.recurrence) {
+    case "monthly":
+      return nextMonthDateAndTime(task?.date, task?.startTime);
+    case "weekly":
+      return nextWeekDateAndTime(task?.date, task?.startTime);
+    case "daily":
+      return nextDayAndTime(task?.date, task?.startTime);
+    default:
+      // Handle other recurrence types if needed
+      return null;
+  }
 };
 
 // Sat | Sun  | Mon | Tue | Wed | Tue | Wed |Thu | Fri

@@ -73,6 +73,7 @@ const TaskScheduleSchema = new Schema(
     },
     nextOccurrence: {
       type: Date,
+      required: [true, "next nextOccurrence date and time is required"],
     },
   },
 

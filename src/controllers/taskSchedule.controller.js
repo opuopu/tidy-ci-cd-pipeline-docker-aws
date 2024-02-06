@@ -94,6 +94,16 @@ const updateTaskSchedule = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const scheduleTask = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.sentReminder();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "task scheduled successfully",
+    data: result,
+  });
+});
+
 const taskScheduleController = {
   insertUserTaskIntoDB,
   getAllTaskSchedule,
@@ -103,5 +113,6 @@ const taskScheduleController = {
   changeTaskStatus,
   reAssignTask,
   updateTaskSchedule,
+  scheduleTask,
 };
 export default taskScheduleController;
