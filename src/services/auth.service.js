@@ -13,6 +13,8 @@ import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
 import { io } from "../server.js";
+import notificationServices from "./notification.service.js";
+import Employee from "../models/employee.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -78,6 +80,54 @@ const signupHomeOwnerIntoDB = async (payload) => {
     throw new Error(err);
   }
 
+  return result[0];
+};
+// signup employee
+const signupEmployeeIntoDb = async (payload) => {
+  const { email, password, phoneNumber, needPasswordChange, ...others } =
+    payload;
+  const authObj = {
+    email,
+    password,
+    phoneNumber,
+    needPasswordChange: true,
+    role: "employee",
+    verified: true,
+  };
+  const user = await User.isUserExist(email);
+  if (user) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Employee already exist with the same email!"
+    );
+  }
+  const session = await mongoose.startSession();
+  let result;
+  try {
+    session.startTransaction();
+    result = await User.create([authObj], { session });
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Somethign Went Wrong");
+    }
+    const insertEmployeeDetails = await Employee.create(
+      [
+        {
+          ...others,
+          user: result[0]?._id,
+        },
+      ],
+      { session }
+    );
+    if (!insertEmployeeDetails) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Somethign Went Wrong");
+    }
+    await session.commitTransaction();
+    await session.endSession();
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
   return result[0];
 };
 const SignInUser = async (payload) => {
@@ -238,5 +288,6 @@ const authServices = {
   forgotPassword,
   resetPassword,
   signupHomeOwnerIntoDB,
+  signupEmployeeIntoDb,
 };
 export default authServices;

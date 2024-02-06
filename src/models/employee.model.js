@@ -11,6 +11,11 @@ const employeeSchema = new Schema(
       ref: "HomeOwner",
       required: [true, "homeOwner inforamtion is required"],
     },
+    user: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: [true, "user inforamtion is required"],
+    },
     image: {
       publicUrl: {
         type: String,
@@ -26,11 +31,19 @@ const employeeSchema = new Schema(
       expireDate: {
         type: Date,
       },
-      reminder: {
-        type: Boolean,
-        default: false,
+    },
+    passport: {
+      passportNumber: {
+        type: Number,
+      },
+      expireDate: {
+        type: Date,
       },
     },
+
+    // access:{
+
+    // }
   },
   {
     timestamps: true,

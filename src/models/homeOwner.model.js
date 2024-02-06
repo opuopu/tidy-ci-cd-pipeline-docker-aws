@@ -12,7 +12,7 @@ const homeOwnerSchema = new Schema({
     type: String,
     unique: true,
   },
-  profileImage: {
+  image: {
     publicUrl: {
       type: String,
     },

@@ -2,10 +2,10 @@ import httpStatus from "http-status";
 import userServices from "../services/user.service.js";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
+import { createFileDetails } from "../utils/file.utils.js";
 
 const getme = catchAsync(async (req, res) => {
   const { userId, role } = req.user;
-  console.log(req.user);
   const result = await userServices.getme(userId, role);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -15,21 +15,11 @@ const getme = catchAsync(async (req, res) => {
   });
 });
 const updateMyProfile = catchAsync(async (req, res) => {
-  const file = {};
   const { userId, role } = req.user;
-
-  if (req.file) {
-    file.publicUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/public/uploads/profile/${req?.file?.filename}`;
-    file.path = req?.file?.path;
+  if (req?.file) {
+    req.body.image = createFileDetails(req, "profile", req?.file?.filename);
   }
-  const result = await userServices.updateMyProfile(
-    userId,
-    role,
-    file,
-    req.body
-  );
+  const result = await userServices.updateMyProfile(userId, role, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

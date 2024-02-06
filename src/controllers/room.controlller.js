@@ -4,6 +4,8 @@ import sendResponse from "../utils/sendResponse.js";
 import roomServices from "../services/room.service.js";
 
 const inserRoomIntoDB = catchAsync(async (req, res) => {
+  const { userId } = req?.user;
+  req.body.user = userId;
   const result = await roomServices.inserRoomIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

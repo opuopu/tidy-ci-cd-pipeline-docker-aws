@@ -5,18 +5,14 @@ const taskListSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "TaskCategory",
     },
-    homeOwner: {
-      type: Schema.Types.ObjectId,
-      ref: "HomeOwner",
-    },
     title: {
       type: String,
       required: [true, "task title is required"],
     },
-    Repeat: {
-      type: String,
-      enum: ["Weekly", "Monthly, weekly", "Daily"],
-    },
+    // Repeat: {
+    //   type: String,
+    //   enum: ["Weekly", "Monthly, weekly", "Daily"],
+    // },
     notes: {
       type: String,
     },
