@@ -10,7 +10,7 @@ const inserRoomIntoDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "room is   created successfully",
+    message: "room is created successfully",
     data: result,
   });
 });

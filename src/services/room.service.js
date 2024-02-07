@@ -2,10 +2,44 @@ import httpStatus from "http-status";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import AppError from "../errors/AppError.js";
 import Room from "../models/room.model.js";
-
+import mongoose from "mongoose";
+import Home from "../models/home.model.js";
 const inserRoomIntoDB = async (payload) => {
-  const result = await Room.create(payload);
-  return result;
+  const session = await mongoose.startSession();
+  const homeObj = {
+    homeTitle: payload?.homeTitle,
+    user: payload?.user,
+  };
+  const roomObj = {
+    title: payload?.title,
+    user: payload?.user,
+    color: payload?.color,
+  };
+  try {
+    session.startTransaction();
+    const createHome = await Home.create([homeObj], { session });
+    if (!createHome[0]) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Home Creation Failed. Please Try Again!"
+      );
+    }
+    roomObj.home = createHome[0]?._id;
+    const createRoom = await Room.create([roomObj], { session });
+    if (!createRoom[0]) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Room Creation Failed. Please Try Again!"
+      );
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return createRoom[0];
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
 };
 const getRoomsByQuery = async (id, query) => {
   const finalQueryObj = {
