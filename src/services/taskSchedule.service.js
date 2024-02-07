@@ -178,6 +178,8 @@ const removeGroceriesFromTask = async (id, payload) => {
   return result;
 };
 const sentReminder = async () => {
+  // for bulk update
+  const notifications = [];
   const date = new Date();
   const currentDate = addMinutes(date, 5);
   const formatedTime = format(currentDate, "HH:mm");
@@ -185,11 +187,11 @@ const sentReminder = async () => {
     { $match: { startTime: formatedTime } },
     {
       $group: {
-        _id: "$employee",
+        _id: 1,
+        employee: "$employee",
       },
     },
   ]);
-  console.log(tasks);
   const uniqueEmployeeMessage = new Set();
   for (const task of tasks) {
     const handleNextOccurrence = getNextOccurrence(task);
@@ -198,19 +200,19 @@ const sentReminder = async () => {
       isSameHour(date, handleNextOccurrence) &&
       isSameMinute(date, handleNextOccurrence)
     ) {
-      const notification = await Notification.create({
+      const notification = {
         receiver: task?.employee,
+        refference: task?._id,
         message: "your task is arrived",
         type: "schedule",
-      });
-      if (notification) {
-        uniqueEmployeeMessage.add(notification?.message);
-      }
+      };
+      notifications.push(notification);
     }
   }
   uniqueEmployeeMessage.forEach((message) => {
     emitMessage("schedule", message);
   });
+  await Notification.insertMany(notifications);
   uniqueEmployeeMessage.clear();
 };
 // schedule.scheduleJob("*/25 * * * *", sentReminder);
