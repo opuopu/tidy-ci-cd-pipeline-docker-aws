@@ -41,15 +41,8 @@ const inserRoomIntoDB = async (payload) => {
     throw new Error(err);
   }
 };
-const getRoomsByQuery = async (id, query) => {
-  const finalQueryObj = {
-    user: id,
-    ...query,
-  };
-  if (query.hasOwnProperty("user") && !query.hasOwnProperty("home")) {
-    throw new AppError(httpStatus.BAD_REQUEST, "something went wrong!");
-  }
-  const roomQuery = new QueryBuilder(Room.find(), finalQueryObj)
+const getRoomsByQuery = async (query) => {
+  const roomQuery = new QueryBuilder(Room.find(), query)
     .search()
     .filter()
     .paginate()
