@@ -10,7 +10,6 @@ export const io = initializeSocketIO(server);
 async function main() {
   try {
     await mongoose.connect(config.database_url);
-
     app.listen(config.port, config.ip, () => {
       console.log(`app is listening on port ${config.port}`);
       infoLogger.info(

@@ -17,12 +17,7 @@ const employeeSchema = new Schema(
       required: [true, "user inforamtion is required"],
     },
     image: {
-      publicUrl: {
-        type: String,
-      },
-      path: {
-        type: String,
-      },
+      type: String,
     },
     cpr: {
       cprNumber: {
