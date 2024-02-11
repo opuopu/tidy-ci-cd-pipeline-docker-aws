@@ -7,6 +7,11 @@ const notificationSchema = new Schema(
       ref: "User",
       required: true,
     },
+    refference: {
+      type: Schema.Types.ObjectId,
+      ref: "Notification",
+      required: true,
+    },
     message: {
       type: String,
       required: true,

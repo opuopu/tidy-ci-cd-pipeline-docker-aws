@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
 import app from "./app.js";
 import { createServer } from "http";
-import infoLogger from "./Logger/InfoLogger.js";
+import infoLogger from "./Logger/infoLogger.js";
 import errorLoger from "./Logger/errorLoger.js";
 import config from "./config/index.js";
-
 import initializeSocketIO from "./socketIo.js";
-
 const server = createServer(app);
 export const io = initializeSocketIO(server);
 async function main() {
@@ -27,7 +25,6 @@ async function main() {
   }
 }
 main();
-
 process.on("unhandledRejection", (err) => {
   console.log(`😈 server is closed by unhandledRejection error `, err);
   errorLoger.error(`😈 server is closed by unhandledRejection error `);
@@ -38,7 +35,6 @@ process.on("unhandledRejection", (err) => {
   }
   process.exit(1);
 });
-
 process.on("uncaughtException", (err) => {
   console.log(err);
   console.log(`😈 server is closed by uncaughtException error,`);

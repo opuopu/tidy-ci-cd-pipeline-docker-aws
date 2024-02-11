@@ -17,7 +17,7 @@ const getme = catchAsync(async (req, res) => {
 const updateMyProfile = catchAsync(async (req, res) => {
   const { userId, role } = req.user;
   if (req?.file) {
-    req.body.image = createFileDetails(req, "profile", req?.file?.filename);
+    req.body.image = createFileDetails("profile", req?.file?.filename);
   }
   const result = await userServices.updateMyProfile(userId, role, req.body);
   sendResponse(res, {

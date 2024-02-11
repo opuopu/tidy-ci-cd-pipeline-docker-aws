@@ -2,7 +2,6 @@ import httpStatus from "http-status";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import roomServices from "../services/room.service.js";
-
 const inserRoomIntoDB = catchAsync(async (req, res) => {
   const { userId } = req?.user;
   req.body.user = userId;
@@ -10,18 +9,20 @@ const inserRoomIntoDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "room is   created successfully",
+    message: "room is created successfully",
     data: result,
   });
 });
 const getRoomsByQuery = catchAsync(async (req, res) => {
-  const { userId } = req.query;
-  const result = await roomServices.getRoomsByQuery(userId, req.query);
+  const { userId } = req.user;
+  req.query.user = userId;
+  const result = await roomServices.getRoomsByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Rooms retrieved successfully.",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getSingleRoom = catchAsync(async (req, res) => {

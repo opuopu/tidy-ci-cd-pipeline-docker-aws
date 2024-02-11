@@ -15,13 +15,12 @@ const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
   });
 });
 const signupEmployeeIntoDb = catchAsync(async (req, res) => {
-  console.log(req.body);
   const { userId } = req.user;
   req.body.homeOwner = userId;
   if (req?.file) {
-    req.body.image = createFileDetails(req, "employee", req?.file?.filename);
+    req.body.image = createFileDetails("employee", req?.file?.filename);
   }
-  console.log(req.body, req.file);
+
   const result = await authServices.signupEmployeeIntoDb(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

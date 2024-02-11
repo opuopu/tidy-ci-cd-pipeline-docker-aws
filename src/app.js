@@ -5,7 +5,6 @@ import path, { dirname } from "path";
 import ApiNotFound from "./middlewares/NotFound.js";
 import cors from "cors";
 import globalErrorHandler from "./middlewares/GlobalErrorHanlder.js";
-import { createServer } from "http";
 import router from "./routes/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,10 +13,8 @@ export const app = express();
 app.use("/public", express.static(path.join(__dirname, "../public")));
 app.use(helmet());
 app.use(express.json());
-
 app.use(cors({ origin: ["*"] }));
 app.use("/api/v1", router);
-
 app.use(globalErrorHandler);
 
 app.get("/", (req, res) => {
