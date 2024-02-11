@@ -16,7 +16,10 @@ const fileUpload = (uploadDirectory) => {
         extenson = "." + parts.pop();
       }
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, parts.shift() + "-" + uniqueSuffix + extenson);
+      cb(
+        null,
+        parts.shift().replace(/\s+/g, "_") + "-" + uniqueSuffix + extenson
+      );
     },
   });
   const upload = multer({

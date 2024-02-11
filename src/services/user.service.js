@@ -58,8 +58,8 @@ const updateMyProfile = async (userId, role, payload) => {
           "Failed to Update homeOwner"
         );
       }
-      if (payload?.image && findFilePath?.image?.path) {
-        await deleteFile(findFilePath.image?.path);
+      if (payload?.image && findFilePath?.image) {
+        await deleteFile(findFilePath.image);
       }
     } else if (role === "employee") {
       const updateUser = await User.findByIdAndUpdate(userId, authObj, {
@@ -77,8 +77,8 @@ const updateMyProfile = async (userId, role, payload) => {
       if (!result) {
         throw new AppError(httpStatus.BAD_REQUEST, "Failed to Update emplooye");
       }
-      if (payload?.image && findFilePath?.image?.path) {
-        await deleteFile(findFilePath.image?.path);
+      if (payload?.image && findFilePath?.image) {
+        await deleteFile(findFilePath.image);
       }
     }
 
