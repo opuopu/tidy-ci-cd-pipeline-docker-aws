@@ -2,9 +2,10 @@ import fs from "fs";
 import util from "util";
 const unlinkSync = util.promisify(fs.unlink);
 const deleteFile = async (path) => {
+  const modifiedPath = `.${path}`;
   try {
-    if (fs.existsSync(path)) {
-      await unlinkSync(path);
+    if (fs.existsSync(modifiedPath)) {
+      await unlinkSync(modifiedPath);
     } else {
       console.log("not found");
     }
@@ -17,5 +18,5 @@ const deleteFile = async (path) => {
 export { deleteFile };
 export const createFileDetails = (folderName, filename) => {
   console.log(folderName, filename);
-  return `./public/uploads/${folderName}/${filename}`;
+  return `/public/uploads/${folderName}/${filename}`;
 };
