@@ -22,7 +22,7 @@ router.post(
   authControllers.signIn
 );
 router.post("/refreshToken", authControllers.refreshToken);
-router.post("/forgot-password", authControllers.forgotPassword);
++router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
   "/resetPassword",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),

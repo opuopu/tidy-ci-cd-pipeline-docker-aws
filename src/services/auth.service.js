@@ -137,7 +137,6 @@ const SignInUser = async (payload) => {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
   }
   const { password: hasedPassword, verified } = user;
-  console.log(user);
   const isPasswordMatched = await User.isPasswordMatched(
     password,
     hasedPassword

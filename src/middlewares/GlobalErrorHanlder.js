@@ -7,7 +7,7 @@ import handleZodError from "../errors/handleZodError.js";
 import config from "../config/index.js";
 
 const globalErrorHandler = (err, req, res, next) => {
-  //setting default values
+  console.log(err.statusCode);
   let statusCode = 500;
   let message = "Something went wrong!";
   let errorSources = [
