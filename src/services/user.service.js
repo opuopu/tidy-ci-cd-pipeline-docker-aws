@@ -5,20 +5,20 @@ import mongoose from "mongoose";
 import HomeOwner from "../models/homeOwner.model.js";
 import { deleteFile } from "../utils/file.utils.js";
 import Employee from "../models/employee.model.js";
+// get me
 const getme = async (userId, role) => {
+  console.log(userId, role);
   let result;
-  if (role === "homeOwner") {
+  if (role === "homeowner") {
     result = await HomeOwner.findOne({ user: userId }).populate("user");
   } else if (role === "employee") {
     result = await Employee.findOne({ user: userId }).populate("user");
   }
-
   return result;
 };
 // update user profile
 const updateMyProfile = async (userId, role, payload) => {
   const { password, role: clientRole, phoneNumber, email, ...others } = payload;
-  console.log(payload, userId);
   const authObj = {
     email,
     phoneNumber,
@@ -33,7 +33,6 @@ const updateMyProfile = async (userId, role, payload) => {
   if (role === "homeowner") {
     findFilePath = await HomeOwner.findOne({ user: userId });
   } else if (role === "employee") {
-    console.log("hitted");
     findFilePath = await Employee.findOne({ user: userId });
   }
   const session = await mongoose.startSession();

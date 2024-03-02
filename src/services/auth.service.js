@@ -130,6 +130,7 @@ const signupEmployeeIntoDb = async (payload) => {
   }
   return result[0];
 };
+// signi
 const SignInUser = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);
@@ -173,7 +174,7 @@ const SignInUser = async (payload) => {
     refreshToken,
   };
 };
-
+// refresh token
 const refreshToken = async (token) => {
   const decodeToken = verifyToken(token, config.jwt_refresh_secret);
   if (!verifyToken) {
@@ -195,6 +196,7 @@ const refreshToken = async (token) => {
   };
 };
 
+// forget password
 const forgotPassword = async ({ otp, email, password }) => {
   // check if user exist
   const isUserExist = await User.isUserExist(email);

@@ -18,7 +18,6 @@ const roomSchema = new Schema(
     color: {
       type: String,
       required: [true, "color code is required"],
-      enum: ["#E7F9F0", "#FFFCEF", "#FFF4E5", "#CEEFE7", "#D9EFF0"],
     },
   },
   {
