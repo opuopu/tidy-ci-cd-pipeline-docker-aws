@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 const homeSchema = new Schema(
   {
-    homeTitle: {
+    title: {
       type: String,
       required: [true, "title is required"],
     },
