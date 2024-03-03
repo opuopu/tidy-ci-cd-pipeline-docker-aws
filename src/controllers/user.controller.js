@@ -27,6 +27,7 @@ const updateMyProfile = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const userControllers = {
   getme,
   updateMyProfile,

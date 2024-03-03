@@ -17,6 +17,7 @@ import tagsRoutes from "./tags.route.js";
 import notificationRoutes from "./notificationRoutes.js";
 import employeeRoutes from "./employee.route.js";
 import taskScheduleRoutes from "./taskSchedule.route.js";
+import FavouriteRecipeRoutes from "./FavouriteRecipe.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -49,6 +50,14 @@ const moduleRoutes = [
   {
     path: "/grocery-lists",
     route: groceryListRoutes,
+  },
+  {
+    path: "/tags",
+    route: tagsRoutes,
+  },
+  {
+    path: "/favourite-recipes",
+    route: FavouriteRecipeRoutes,
   },
   {
     path: "/recipes",
@@ -85,10 +94,6 @@ const moduleRoutes = [
   {
     path: "/employees",
     route: employeeRoutes,
-  },
-  {
-    path: "/tags",
-    route: tagsRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

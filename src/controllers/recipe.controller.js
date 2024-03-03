@@ -20,16 +20,14 @@ const insertRecipeIntoDB = catchAsync(async (req, res) => {
 
 const getAllRecipesByQuery = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const query = {
-    user: userId,
-    ...req.query,
-  };
-  const result = await recipeServices.getAllRecipesByQuery(query);
+  req.query.user = userId;
+  const result = await recipeServices.getAllRecipesByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "recipes retrived successfully",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getSingleRecipe = catchAsync(async (req, res) => {
@@ -66,42 +64,41 @@ const deleteRecipe = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 const addToFavoriteRecipes = catchAsync(async (req, res) => {
   const { userId } = req.user;
   const result = await recipeServices.addToFavoriteRecipes(
-    req.params.id,
-    userId
+    userId,
+    req.body.recipeId
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Recipe successfully added to your favorites!",
+    message: "recipe successfully added to favorite lists",
     data: result,
   });
 });
-const getAllFavoriteRecipes = catchAsync(async (req, res) => {
+const getMyFavouriteRecipe = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const result = await recipeServices.getAllFavoriteRecipes(userId);
-
+  req.query.user = userId;
+  const result = await recipeServices.getFavouriteRecipes(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "favourite recipes retrived successfully",
+    message: "FavouriteRecipes Retrived successfully",
     data: result,
   });
 });
-const removeRecipeFromFavoritelist = catchAsync(async (req, res) => {
+const removeFromFavouriteList = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const result = await recipeServices.removeRecipeFromFavoritelist(
-    req.params.id,
-    userId
+  req.query.user = userId;
+  const result = await recipeServices.deleteFromFavoriteRecipes(
+    userId,
+    req.params.id
   );
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Recipe successfully removed from the list.",
+    message: "Recipe Deleted Successfully",
     data: result,
   });
 });
@@ -113,7 +110,7 @@ const recipeControllers = {
   updateRecipe,
   deleteRecipe,
   addToFavoriteRecipes,
-  getAllFavoriteRecipes,
-  removeRecipeFromFavoritelist,
+  getMyFavouriteRecipe,
+  removeFromFavouriteList,
 };
 export default recipeControllers;
