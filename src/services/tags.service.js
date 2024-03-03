@@ -44,10 +44,10 @@ const updateTags = async (id, userId, payload) => {
   return result;
 };
 const deleteTag = async (id, userId) => {
-  const result = await Tags.findByIdAndDelete({
+  const result = await Tags.findOneAndDelete({
     $and: [
       {
-        _Id: id,
+        _id: id,
       },
       {
         user: userId,

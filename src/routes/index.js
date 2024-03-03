@@ -3,7 +3,6 @@ import { Router } from "express";
 import otpRoutes from "./otp.routes.js";
 import homeRoutes from "./home.route.js";
 import roomRoutes from "./room.route.js";
-import tagsRoutes from "./tags.route.js";
 import userRoutes from "./user.route.js";
 import homeOwnerRoutes from "./homeOwner.route.js";
 import groceryCategoryRoutes from "./groceryCategory.route.js";
@@ -14,7 +13,7 @@ import budgetRoutes from "./budget.route.js";
 import userGroceryListsRoutes from "./userGroceryList.route.js";
 import taskCategoryRoutes from "./taskCategory.route.js";
 import taskListRoutes from "./taskList.route.js";
-
+import tagsRoutes from "./tags.route.js";
 import notificationRoutes from "./notificationRoutes.js";
 import employeeRoutes from "./employee.route.js";
 import taskScheduleRoutes from "./taskSchedule.route.js";
@@ -45,13 +44,8 @@ const moduleRoutes = [
     path: "/rooms",
     route: roomRoutes,
   },
-  {
-    path: "/tags",
-    route: tagsRoutes,
 
-    path: "/grocery-categories",
-    route: groceryCategoryRoutes,
-  },
+  { path: "/grocery-categories", route: groceryCategoryRoutes },
   {
     path: "/grocery-lists",
     route: groceryListRoutes,
@@ -91,6 +85,10 @@ const moduleRoutes = [
   {
     path: "/employees",
     route: employeeRoutes,
+  },
+  {
+    path: "/tags",
+    route: tagsRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

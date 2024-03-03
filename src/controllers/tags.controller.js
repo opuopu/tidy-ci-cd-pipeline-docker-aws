@@ -5,11 +5,8 @@ import sendResponse from "../utils/sendResponse.js";
 
 const insertTagIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const data = {
-    ...req.body,
-    user: userId,
-  };
-  const result = await tagservices.insertTagIntoDB(data);
+  req.body.user = userId;
+  const result = await tagservices.insertTagIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
