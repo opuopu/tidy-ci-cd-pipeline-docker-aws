@@ -3,6 +3,7 @@ import AppError from "../errors/AppError.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import Recipe from "../models/recipe.model.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
+import FavouriteRecipe from "../models/favouriteRecipe.model.js";
 
 const insertRecipeIntoDB = async (payload) => {
   const result = await Recipe.create(payload);
@@ -47,57 +48,34 @@ const deleteRecipe = async (id, userId) => {
   return result;
 };
 
-const addToFavoriteRecipes = async (id, userId) => {
-  const checkifExistinFavouriteList = await Recipe.findOne({
-    _id: id,
-    user: userId,
-    favouriteList: true,
-  });
-  if (checkifExistinFavouriteList) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "recipe already exist in favourite list"
-    );
-  }
-  const result = await Recipe.findOneAndUpdate(
-    { _id: id, user: userId },
-    {
-      favouriteList: true,
-    },
-    { new: true }
+const addToFavoriteRecipes = async (userId, recipeId) => {
+  const result = await FavouriteRecipe.findOneAndUpdate(
+    { user: userId },
+    { $addToSet: { lists: recipeId } },
+    { new: true },
+    { upsert: true }
   );
   return result;
 };
-const getAllFavoriteRecipes = async (userId) => {
-  const query = {
-    user: userId,
-    favouriteList: true,
-  };
-  const recipeQuery = new QueryBuilder(Recipe.find(), query)
-    .search()
-    .filter()
-    .paginate()
-    .sort();
-  const result = await recipeQuery.modelQuery;
-  const meta = await recipeQuery.meta();
-  return {
-    meta,
-    result,
-  };
+
+const getFavouriteRecipes = async (query) => {
+  const result = await FavouriteRecipe.findOne(query).populate("lists");
+  return result?.lists;
 };
-const removeRecipeFromFavoritelist = async (id, userId) => {
-  const result = await Recipe.findOneAndUpdate(
-    { $and: [{ _id: id, user: userId }] },
+
+const deleteFromFavoriteRecipes = async (userId, recipeId) => {
+  const result = await FavouriteRecipe.findOneAndUpdate(
+    { user: userId },
     {
-      $set: {
-        favouriteList: false,
+      $pull: {
+        lists: recipeId,
       },
     },
     { new: true }
   );
-
   return result;
 };
+
 const recipeServices = {
   insertRecipeIntoDB,
   getAllRecipesByQuery,
@@ -105,7 +83,7 @@ const recipeServices = {
   updateRecipe,
   deleteRecipe,
   addToFavoriteRecipes,
-  getAllFavoriteRecipes,
-  removeRecipeFromFavoritelist,
+  getFavouriteRecipes,
+  deleteFromFavoriteRecipes,
 };
 export default recipeServices;

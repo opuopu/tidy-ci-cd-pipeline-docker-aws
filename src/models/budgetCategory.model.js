@@ -6,12 +6,8 @@ const budgetCategorySchema = new Schema(
       required: [true, "category title is required"],
     },
     icon: {
-      publicUrl: {
-        type: String,
-      },
-      path: {
-        type: String,
-      },
+      type: String,
+      required: [true, "category icon is required"],
     },
   },
   {

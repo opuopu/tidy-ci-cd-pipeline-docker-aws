@@ -3,17 +3,13 @@ import httpStatus from "http-status";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import budgetCategoryServices from "../services/budgetCategory.service.js";
+import { createFileDetails } from "../utils/file.utils.js";
 
 const insertBudgetCategoryIntoDb = catchAsync(async (req, res) => {
-  const file = {};
-
-  if (req.file) {
-    file.publicUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/public/uploads/icons/${req?.file?.filename}`;
-    file.path = req?.file?.path;
+  if (req?.file) {
+    req.body.icon = createFileDetails("budgetCategory", req?.file?.fileName);
   }
-  req.body.icon = file;
+
   const result = await budgetCategoryServices.insertBudgetCategoryIntoDb(
     req.body
   );
@@ -29,8 +25,9 @@ const getallFromDb = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "budget categories  retrived successfully",
-    data: result,
+    message: "budgets  retrived successfully",
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getSingleFromDb = catchAsync(async (req, res) => {

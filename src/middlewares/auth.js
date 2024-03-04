@@ -11,11 +11,14 @@ const auth = (...userRoles) => {
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized!");
     }
-    const decode = jwt.verify(token, config.jwt_access_secret);
-    if (!decode) {
-      throw new AppError(httpStatus.UNAUTHORIZED, "invalid token");
+    let decode;
+    try {
+      decode = jwt.verify(token, config.jwt_access_secret);
+    } catch (err) {
+      throw new AppError(httpStatus.UNAUTHORIZED, "unauthorized");
     }
-    const { role, userId, email, phoneNumber } = decode;
+
+    const { role, email } = decode;
     const isUserExist = User.isUserExist(email);
     if (!isUserExist) {
       throw new AppError(httpStatus.NOT_FOUND, "user not found");

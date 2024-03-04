@@ -7,14 +7,10 @@ import Home from "../models/home.model.js";
 const inserRoomIntoDB = async (payload) => {
   const session = await mongoose.startSession();
   const homeObj = {
-    homeTitle: payload?.homeTitle,
+    title: payload?.homeTitle,
     user: payload?.user,
   };
-  const roomObj = {
-    title: payload?.title,
-    user: payload?.user,
-    color: payload?.color,
-  };
+
   try {
     session.startTransaction();
     const createHome = await Home.create([homeObj], { session });
@@ -24,8 +20,12 @@ const inserRoomIntoDB = async (payload) => {
         "Home Creation Failed. Please Try Again!"
       );
     }
-    roomObj.home = createHome[0]?._id;
-    const createRoom = await Room.create([roomObj], { session });
+    const rooms = payload.rooms.map((room) => ({
+      home: createHome[0]._id,
+      ...room,
+    }));
+
+    const createRoom = await Room.create(rooms, { session });
     if (!createRoom[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,

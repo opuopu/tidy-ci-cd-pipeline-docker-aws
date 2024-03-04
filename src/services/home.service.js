@@ -1,6 +1,9 @@
+import httpStatus from "http-status";
 import QueryBuilder from "../builder/QueryBuilder.js";
+import AppError from "../errors/AppError.js";
 import Home from "../models/home.model.js";
-
+import mongoose from "mongoose";
+import Room from "../models/room.model.js";
 const inserHomeIntoDB = async (payload) => {
   const result = await Home.create(payload);
   return result;
@@ -31,8 +34,26 @@ const updateHome = async (id, payload) => {
   return result;
 };
 const deleteHome = async (id) => {
-  const result = await Home.findByIdAndDelete(id);
-  return result;
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const deleteHome = await Home.findByIdAndDelete(id);
+    if (!deleteHome) {
+      throw (
+        (new AppError(httpStatus.METHOD_NOT_ALLOWED, "Failed To Delete Home"),
+        { session })
+      );
+    }
+    await Room.deleteMany({ home: id }, { session });
+
+    await session.commitTransaction();
+    await session.endSession();
+    return deleteHome;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
 };
 
 const homeServices = {

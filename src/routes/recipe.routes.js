@@ -10,11 +10,6 @@ router.post(
   recipeControllers.insertRecipeIntoDB
 );
 router.get(
-  "/get-favourite-list/",
-  auth(USER_ROLE.HOMEOWNER),
-  recipeControllers.getAllFavoriteRecipes
-);
-router.get(
   "/",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   recipeControllers.getAllRecipesByQuery
@@ -29,16 +24,6 @@ router.delete(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
   recipeControllers.deleteRecipe
-);
-router.patch(
-  "/add-to-favourite-list/:id",
-  auth(USER_ROLE.HOMEOWNER),
-  recipeControllers.addToFavoriteRecipes
-);
-router.delete(
-  "/remove-from-favourite-list/:id",
-  auth(USER_ROLE.HOMEOWNER),
-  recipeControllers.removeRecipeFromFavoritelist
 );
 
 const recipeRoutes = router;

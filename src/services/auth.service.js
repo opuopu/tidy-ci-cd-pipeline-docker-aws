@@ -12,8 +12,7 @@ import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
-import { io } from "../server.js";
-import notificationServices from "./notification.service.js";
+
 import Employee from "../models/employee.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
@@ -130,6 +129,7 @@ const signupEmployeeIntoDb = async (payload) => {
   }
   return result[0];
 };
+// signi
 const SignInUser = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);
@@ -137,7 +137,6 @@ const SignInUser = async (payload) => {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
   }
   const { password: hasedPassword, verified } = user;
-  console.log(user);
   const isPasswordMatched = await User.isPasswordMatched(
     password,
     hasedPassword
@@ -174,7 +173,7 @@ const SignInUser = async (payload) => {
     refreshToken,
   };
 };
-
+// refresh token
 const refreshToken = async (token) => {
   const decodeToken = verifyToken(token, config.jwt_refresh_secret);
   if (!verifyToken) {
@@ -196,6 +195,7 @@ const refreshToken = async (token) => {
   };
 };
 
+// forget password
 const forgotPassword = async ({ otp, email, password }) => {
   // check if user exist
   const isUserExist = await User.isUserExist(email);
