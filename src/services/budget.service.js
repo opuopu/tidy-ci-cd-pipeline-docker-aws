@@ -1,13 +1,26 @@
+import dayjs from "dayjs";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import Budget from "../models/budget.model.js";
-
+import AppError from "../errors/AppError.js";
+import httpStatus from "http-status";
 const insertBudgetIntoDB = async (payload) => {
+  const { month } = payload;
+  const isExistBudget = await Budget.findOne({
+    user: payload?.user,
+    category: payload?.category,
+  });
+  if (isExistBudget) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      "Budget Already Exist With This Category"
+    );
+  }
+  const formattedDate = dayjs(month).format("01-MM-YYYY");
+  payload.month = formattedDate;
   const result = await Budget.create(payload);
   return result;
 };
-
-const getbudgetsByQuery = async (userId, payload) => {
-  const query = userId ? { ...payload, user: userId } : { ...payload };
+const getbudgetsByQuery = async (query) => {
   const budgetModel = new QueryBuilder(Budget.find(), query)
     .search()
     .filter()

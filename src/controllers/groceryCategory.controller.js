@@ -2,7 +2,6 @@ import httpStatus from "http-status";
 import groceryCategoryServices from "../services/GroceryCategory.Service.js";
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
-
 const insertGroceryCategoryIntoDB = catchAsync(async (req, res) => {
   const result = await groceryCategoryServices.insertGroceryCategoryIntoDB(
     req.body

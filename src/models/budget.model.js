@@ -1,16 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 const budgetSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: [true, "budget name is required"],
-    },
-    period: {
-      type: String,
-      enum: ["Week", "Month", "Year", "One Time"],
-      trim: true,
-      required: [true, "budget period is required"],
-    },
     category: {
       type: Types.ObjectId,
       ref: "budgetCategory",
@@ -23,15 +13,24 @@ const budgetSchema = new Schema(
     },
     amountType: {
       type: String,
+      enum: ["bhd", "usd"],
       required: [true, "amount type is required"],
     },
     amount: {
       type: Number,
       required: [true, "amount  is required"],
     },
+    remainingAmount: {
+      type: Number,
+      default: 0,
+    },
     month: {
-      type: Date,
-      // required: [true, "month is required"],
+      type: String,
+      required: [true, "month is required"],
+    },
+    progress: {
+      type: Number,
+      default: 0,
     },
   },
   {

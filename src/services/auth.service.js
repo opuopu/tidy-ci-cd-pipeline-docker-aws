@@ -12,8 +12,7 @@ import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
-import { io } from "../server.js";
-import notificationServices from "./notification.service.js";
+
 import Employee from "../models/employee.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {

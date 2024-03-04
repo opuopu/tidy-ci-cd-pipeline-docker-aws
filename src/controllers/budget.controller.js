@@ -6,6 +6,7 @@ import budgetServices from "../services/budget.service.js";
 
 const insertBudgetIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
+  req.body.remainingAmount = req.body.amount;
   req.body.user = userId;
   const result = await budgetServices.insertBudgetIntoDB(req.body);
   sendResponse(res, {
@@ -17,12 +18,14 @@ const insertBudgetIntoDB = catchAsync(async (req, res) => {
 });
 const getbudgetsByQuery = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  const result = await budgetServices.getbudgetsByQuery(userId, req.query);
+  req.query.user = userId;
+  const result = await budgetServices.getbudgetsByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "budget created successfully",
-    data: result,
+    message: "budgets retrived successfully",
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getsingleBudget = catchAsync(async (req, res) => {
