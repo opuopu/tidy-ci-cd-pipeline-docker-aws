@@ -17,9 +17,9 @@ router.post(
   authControllers.signupEmployeeIntoDb
 );
 router.post(
-  "/signin",
+  "/homeOwner/signIn",
   validateRequest(authValidation.singinSchema),
-  authControllers.signIn
+  authControllers.SigninHomeOwner
 );
 router.post("/refreshToken", authControllers.refreshToken);
 +router.post("/forgot-password", authControllers.forgotPassword);

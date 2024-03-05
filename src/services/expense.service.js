@@ -3,6 +3,7 @@ import Expense from "../models/expense.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import Budget from "../models/budget.model.js";
+import dayjs from "dayjs";
 const InsertExpenseIntoDb = async (payload) => {
   const session = await mongoose.startSession();
   const findBudget = await Budget.findById(payload.budget);
@@ -18,9 +19,13 @@ const InsertExpenseIntoDb = async (payload) => {
       "Insufficient remaining budget. Please adjust the budget amount."
     );
   }
+  const formatedData = {
+    ...payload,
+    category: findBudget?.category,
+  };
   try {
     session.startTransaction();
-    const result = await Expense.create([payload], { session });
+    const result = await Expense.create([formatedData], { session });
     if (!result[0]) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to create expense");
     }
@@ -48,8 +53,39 @@ const InsertExpenseIntoDb = async (payload) => {
   }
 };
 
-const getBudgetWiseExpenses = async (query) => {
-  const result = await Expense.find(query).populate("budget");
+const getBudgetWiseExpenses = async (budgetId) => {
+  const budgetObjectId = new mongoose.Types.ObjectId(budgetId);
+  const pipeline = [
+    { $match: { budget: budgetObjectId } },
+    {
+      $lookup: {
+        from: "budgets",
+        localField: "budget",
+        foreignField: "_id",
+        as: "budgetInfo",
+      },
+    },
+    { $unwind: "$budgetInfo" },
+    {
+      $lookup: {
+        from: "budgetcategories",
+        localField: "budgetInfo.category",
+        foreignField: "_id",
+        as: "categoryInfo",
+      },
+    },
+    { $unwind: "$categoryInfo" },
+    {
+      $project: {
+        _id: 0,
+        icon: "$categoryInfo.icon",
+        title: "$categoryInfo.title",
+        date: "$date",
+        amount: "$amount",
+      },
+    },
+  ];
+  const result = await Expense.aggregate(pipeline);
   return result;
 };
 

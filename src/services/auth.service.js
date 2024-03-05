@@ -18,68 +18,20 @@ import Employee from "../models/employee.model.js";
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
   const user = await User.isUserExist(email);
-  if (user && user?.verified) {
+  if (user) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "user already exist with the same email!"
     );
   }
-  const session = await mongoose.startSession();
-  let result;
-  try {
-    session.startTransaction();
-    if (user && !user?.verified) {
-      const deleteUser = await User.findOneAndDelete(
-        { email: email },
-        { session }
-      );
-      if (!deleteUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
-      }
-      const deletehomeOwner = await HomeOwner.findOneAndDelete(
-        {
-          user: user?._id,
-        },
-        { session }
-      );
-      if (!deletehomeOwner) {
-        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
-      }
-    }
-
-    const authObj = {
-      email: payload.email,
-      password: payload.password,
-      role: payload.role,
-      phoneNumber: payload.phoneNumber,
-    };
-
-    const createnewUser = await User.create([authObj], { session });
-    if (!createnewUser.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, "failed to create user");
-    }
-
-    const finalObj = {
-      ...payload,
-      user: createnewUser[0]?._id,
-      refferalCode: generateRefferalCode(),
-    };
-    result = await HomeOwner.create([finalObj], { session });
-    setTimeout(async () => {
-      await otpServices.createAnOtpIntoDB({
-        email,
-        type: "signupVerification",
-      });
-    }, 1000);
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (err) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error(err);
+  const checkDuplicatePhone = await User.isDuplicatePhone(payload?.phoneNumber);
+  if (checkDuplicatePhone) {
+    throw new AppError(httpStatus.BAD_REQUEST, "use different phone");
   }
-
-  return result[0];
+  await otpServices.createAnOtpIntoDB({
+    email,
+    type: "signupVerification",
+  });
 };
 // signup employee
 const signupEmployeeIntoDb = async (payload) => {
@@ -130,11 +82,14 @@ const signupEmployeeIntoDb = async (payload) => {
   return result[0];
 };
 // signi
-const SignInUser = async (payload) => {
+const SigninHomeOwner = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  }
+  if (user?.role !== "homeowner") {
+    throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
   }
   const { password: hasedPassword, verified } = user;
   const isPasswordMatched = await User.isPasswordMatched(
@@ -144,12 +99,12 @@ const SignInUser = async (payload) => {
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match!");
   }
-  if (!verified) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "please verify your account first!"
-    );
-  }
+  // if (!verified) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "please verify your account first!"
+  //   );
+  // }
 
   const jwtPayload = {
     userId: user.id,
@@ -169,10 +124,12 @@ const SignInUser = async (payload) => {
   );
 
   return {
+    user,
     accessToken,
     refreshToken,
   };
 };
+
 // refresh token
 const refreshToken = async (token) => {
   const decodeToken = verifyToken(token, config.jwt_refresh_secret);
@@ -216,7 +173,7 @@ const forgotPassword = async ({ otp, email, password }) => {
     await Otp.findByIdAndDelete(isOtpExist?._id);
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "OTP has expired. Please request a new one and try again"
+      "otp has expired.plaesed resend it."
     );
   }
   // check is otp matched
@@ -283,7 +240,7 @@ const resetPassword = async (id, payload) => {
 };
 
 const authServices = {
-  SignInUser,
+  SigninHomeOwner,
   refreshToken,
   forgotPassword,
   resetPassword,

@@ -3,7 +3,12 @@ const expenseSchema = new Schema(
   {
     budget: {
       type: Types.ObjectId,
-      ref: "budgetCategory",
+      ref: "Budget",
+      required: [true, "budget category is required"],
+    },
+    category: {
+      type: Types.ObjectId,
+      ref: "Budget",
       required: [true, "budget category is required"],
     },
     amount: {

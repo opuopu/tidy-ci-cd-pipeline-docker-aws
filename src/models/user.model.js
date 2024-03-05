@@ -5,7 +5,7 @@ const userSchema = new Schema(
   {
     phoneNumber: {
       type: Number,
-      required: [true, "phone number is required"],
+      // required: [true, "phone number is required"],
       unique: true,
     },
     email: {
@@ -31,7 +31,7 @@ const userSchema = new Schema(
     },
     verified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {
@@ -48,9 +48,11 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
 userSchema.statics.isUserExist = async function (email) {
   return await User.findOne({ email: email }).select("+password");
+};
+userSchema.statics.isDuplicatePhone = async function (phoneNumber) {
+  return await User.findOne({ phoneNumber: phoneNumber });
 };
 userSchema.statics.checkUserExistById = async function (id) {
   return await User.findOne({ _id: id }).select("+password");

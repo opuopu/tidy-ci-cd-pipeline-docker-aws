@@ -9,6 +9,11 @@ router.post(
   budgetControllers.insertBudgetIntoDB
 );
 router.get(
+  "/budget-vs-expense",
+  auth(USER_ROLE.HOMEOWNER),
+  budgetControllers.budgetVsExpense
+);
+router.get(
   "/",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   budgetControllers.getbudgetsByQuery
