@@ -6,11 +6,16 @@ const userSchema = new Schema(
     phoneNumber: {
       type: Number,
       // required: [true, "phone number is required"],
-      unique: true,
+      // unique: true,
     },
     email: {
       type: String,
       required: [true, "email is required"],
+      unique: true,
+    },
+    id: {
+      type: String,
+      required: [true, "id is required"],
       unique: true,
     },
     password: {
@@ -28,6 +33,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: ["homeowner", "employee"],
+      required: [true, "role is required"],
     },
     verified: {
       type: Boolean,

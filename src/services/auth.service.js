@@ -24,10 +24,6 @@ const signupHomeOwnerIntoDB = async (payload) => {
       "user already exist with the same email!"
     );
   }
-  const checkDuplicatePhone = await User.isDuplicatePhone(payload?.phoneNumber);
-  if (checkDuplicatePhone) {
-    throw new AppError(httpStatus.BAD_REQUEST, "use different phone");
-  }
   await otpServices.createAnOtpIntoDB({
     email,
     type: "signupVerification",
@@ -91,7 +87,7 @@ const SigninHomeOwner = async (payload) => {
   if (user?.role !== "homeowner") {
     throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
   }
-  const { password: hasedPassword, verified } = user;
+  const { password: hasedPassword } = user;
   const isPasswordMatched = await User.isPasswordMatched(
     password,
     hasedPassword
@@ -110,6 +106,7 @@ const SigninHomeOwner = async (payload) => {
     userId: user.id,
     email: user.email,
     role: user.role,
+    id: user?.id,
     verified: user.verified,
   };
   const accessToken = createToken(

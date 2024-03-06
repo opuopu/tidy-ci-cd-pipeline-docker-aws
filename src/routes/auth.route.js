@@ -18,11 +18,11 @@ router.post(
 );
 router.post(
   "/homeOwner/signIn",
-  validateRequest(authValidation.singinSchema),
+  // validateRequest(authValidation.singinSchema),
   authControllers.SigninHomeOwner
 );
 router.post("/refreshToken", authControllers.refreshToken);
-+router.post("/forgot-password", authControllers.forgotPassword);
+router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
   "/resetPassword",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),

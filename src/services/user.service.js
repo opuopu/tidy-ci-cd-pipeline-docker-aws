@@ -7,14 +7,24 @@ import { deleteFile } from "../utils/file.utils.js";
 import Employee from "../models/employee.model.js";
 // get me
 const getme = async (userId, role) => {
-  console.log(userId, role);
   let result;
   if (role === "homeowner") {
     result = await HomeOwner.findOne({ user: userId }).populate("user");
   } else if (role === "employee") {
     result = await Employee.findOne({ user: userId }).populate("user");
   }
-  return result;
+  const formatedObject = {
+    _id: result.user?._id,
+    name: result?.name,
+    image: result?.image,
+    email: result?.user?.email,
+    phoneNumber: result?.user?.phoneNumber,
+    role: result?.user?.role,
+    refferalCode: result?.refferalCode,
+    homes: result?.homes,
+  };
+  console.log(formatedObject);
+  return formatedObject;
 };
 // update user profile
 const updateMyProfile = async (userId, role, payload) => {

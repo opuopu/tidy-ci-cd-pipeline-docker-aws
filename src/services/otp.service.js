@@ -9,6 +9,8 @@ import mongoose from "mongoose";
 import { generateOtp } from "../utils/OtpGenerator.js";
 import { createToken, generateRefferalCode } from "../utils/auth.utils.js";
 import HomeOwner from "../models/homeOwner.model.js";
+import { generateNewHomeOwnerId } from "../utils/homeowner.utils.js";
+
 const createAnOtpIntoDB = async ({ email, type }) => {
   const otp = generateOtp();
   const expiresAt = new Date(Date.now() + 3600000);
@@ -19,6 +21,7 @@ const createAnOtpIntoDB = async ({ email, type }) => {
     otp: decryptOtp,
     expiresAt,
   };
+  await Otp.findOneAndDelete({ email: email, type: type });
   const result = await Otp.create(otpObj);
   if (!result) {
     throw new AppError(
@@ -34,14 +37,6 @@ const createAnOtpIntoDB = async ({ email, type }) => {
   );
 };
 const veriFySignupOtp = async (payload) => {
-  // check if user is already verified
-  const isUserVerfied = await User.findOne({ email: payload?.email });
-  if (isUserVerfied?.verified) {
-    await Otp.findOneAndDelete({
-      $and: [{ email: payload?.email }, { type: "signupVerification" }],
-    });
-    throw new AppError(httpStatus.CONFLICT, "User Account Already Verified");
-  }
   // check is exist otp
   const isExistOtp = await Otp.isExistOtp(payload?.email, "signupVerification");
   if (!isExistOtp) {
@@ -62,33 +57,34 @@ const veriFySignupOtp = async (payload) => {
   }
   // check is otp matched
   const isOtpMatched = await Otp.isOtpMatched(payload?.otp, isExistOtp?.otp);
-
   if (!isOtpMatched)
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "otp did not match.plese try again"
     );
 
-  let result;
   const session = await mongoose.startSession();
+  let result;
   try {
     session.startTransaction();
+    const id = await generateNewHomeOwnerId();
     const authObj = {
       email: payload.email,
       password: payload.password,
       role: payload.role,
       phoneNumber: payload.phoneNumber,
+      id: id,
     };
-
     const createUser = await User.create([authObj], { session });
     if (!createUser[0]) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to create user");
     }
-    console.log(createUser[0]);
     const homeOwnerObject = {
       name: payload?.name,
       user: createUser[0]?._id,
       refferalCode: generateRefferalCode(),
+      image: "/uploads/profile/defaultProfile.png",
+      id: id,
     };
     const createHomeOwner = await HomeOwner.create([homeOwnerObject], {
       session,
@@ -101,6 +97,7 @@ const veriFySignupOtp = async (payload) => {
       userId: createUser[0]._id,
       email: createUser[0].email,
       role: createUser[0].role,
+      id: id,
       verified: createUser[0].verified,
     };
     const accessToken = createToken(
@@ -113,11 +110,19 @@ const veriFySignupOtp = async (payload) => {
       config.jwt_refresh_secret,
       config.jwt_refresh_expires_in
     );
+    const formatedObject = {
+      email: createUser[0]?.email,
+      phoneNumber: createUser[0]?.phoneNumber ?? null,
+      refferalCode: createHomeOwner[0]?.refferalCode,
+      homes: createHomeOwner[0]?.homes,
+      name: createHomeOwner[0]?.name,
+    };
 
     await session.commitTransaction();
     await session.endSession();
+
     return {
-      user: createUser[0],
+      user: formatedObject,
       accessToken,
       refreshToken,
     };
