@@ -103,9 +103,8 @@ const SigninHomeOwner = async (payload) => {
   // }
 
   const { password: newsdfd, ...others } = user.toObject();
-
   const jwtPayload = {
-    userId: user.id,
+    userId: user?._id,
     email: user.email,
     role: user.role,
     id: user?.id,

@@ -24,7 +24,7 @@ const homeOwnerSchema = new Schema(
     },
     homes: [
       {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Home",
       },
     ],
