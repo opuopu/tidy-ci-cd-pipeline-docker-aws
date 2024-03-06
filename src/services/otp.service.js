@@ -72,7 +72,7 @@ const veriFySignupOtp = async (payload) => {
       email: payload.email,
       password: payload.password,
       role: payload.role,
-      phoneNumber: payload.phoneNumber,
+
       id: id,
     };
     const createUser = await User.create([authObj], { session });
