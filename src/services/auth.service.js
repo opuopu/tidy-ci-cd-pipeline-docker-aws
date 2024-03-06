@@ -152,33 +152,12 @@ const refreshToken = async (token) => {
 
 // forget password
 const forgotPassword = async ({ otp, email, password }) => {
-  // check if user exist
+  console.log(email);
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email");
   }
-  // check is otp exist
-  const isOtpExist = await Otp.isExistOtp(email, "forgotPassWordVerification");
-  if (!isOtpExist) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Otp Information Not Found. Please Resend It"
-    );
-  }
-  // check is otp expires
-  const isOtpExpires = await Otp.isOtpExpired(isOtpExist?.expiresAt);
-  if (isOtpExpires) {
-    await Otp.findByIdAndDelete(isOtpExist?._id);
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "otp has expired.plaesed resend it."
-    );
-  }
-  // check is otp matched
-  const isOtpMatched = await Otp.isOtpMatched(otp, isOtpExist?.otp);
-  if (!isOtpMatched) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
-  }
+
   const hasedPassword = await bcrypt.hash(
     password,
     Number(config.bcrypt_salt_rounds)
@@ -195,11 +174,10 @@ const forgotPassword = async ({ otp, email, password }) => {
       },
       { new: true, session }
     );
-    if (result) {
-      await Otp.findByIdAndDelete(isOtpExist?._id, { session });
-    }
+
     await session.commitTransaction();
     await session.endSession();
+    return result;
   } catch (err) {
     await session.abortTransaction();
     await session.endSession();

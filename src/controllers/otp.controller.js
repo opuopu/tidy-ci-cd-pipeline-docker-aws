@@ -20,9 +20,18 @@ const veriFySignupOtp = catchAsync(async (req, res) => {
     data: result ? result : null,
   });
 });
-
+const verifyForgetPasswordOtp = catchAsync(async (req, res) => {
+  const result = await otpServices.verifyForgetPasswordOtp(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "OTP verified successfully",
+    data: result ? result : null,
+  });
+});
 const otpControllers = {
   createAnOtp,
   veriFySignupOtp,
+  verifyForgetPasswordOtp,
 };
 export default otpControllers;

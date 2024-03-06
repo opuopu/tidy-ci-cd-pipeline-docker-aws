@@ -132,9 +132,68 @@ const veriFySignupOtp = async (payload) => {
     throw new Error(err);
   }
 };
+const verifyForgetPasswordOtp = async (payload) => {
+  const findOtp = await Otp.findOne({
+    email: payload?.email,
+    type: "forgotPassWordVerification",
+  });
+  if (!findOtp) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "otp information not found.please resend it"
+    );
+  }
+
+  const { expiresAt } = findOtp;
+  // check is otp expired
+  const isOtpExpired = await Otp.isOtpExpired(expiresAt);
+  if (isOtpExpired) {
+    await Otp.deleteOne({ email: payload?.email, expiresAt: expiresAt });
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "otp has expired. please resend it"
+    );
+  }
+  // check is otp matched
+  const isOtpMatched = await Otp.isOtpMatched(payload?.otp, findOtp?.otp);
+  if (!isOtpMatched)
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "otp did not match.plese try again"
+    );
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const updateOtp = await Otp.findByIdAndUpdate(
+      findOtp?._id,
+      {
+        $set: {
+          verificationStatus: true,
+        },
+      },
+      { new: true, session }
+    );
+    if (!updateOtp) {
+      throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
+    }
+    const deleteOtp = await Otp.findByIdAndDelete(findOtp?._id, { session });
+    if (!deleteOtp) {
+      throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return updateOtp;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+  return updateOtp;
+};
 
 const otpServices = {
   createAnOtpIntoDB,
   veriFySignupOtp,
+  verifyForgetPasswordOtp,
 };
 export default otpServices;
