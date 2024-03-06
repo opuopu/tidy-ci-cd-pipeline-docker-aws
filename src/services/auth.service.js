@@ -102,6 +102,8 @@ const SigninHomeOwner = async (payload) => {
   //   );
   // }
 
+  const { password: newsdfd, ...others } = user.toObject();
+
   const jwtPayload = {
     userId: user.id,
     email: user.email,
@@ -121,7 +123,7 @@ const SigninHomeOwner = async (payload) => {
   );
 
   return {
-    user,
+    user: others,
     accessToken,
     refreshToken,
   };
