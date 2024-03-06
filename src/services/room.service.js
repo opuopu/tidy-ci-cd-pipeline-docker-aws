@@ -61,6 +61,7 @@ const inserRoomIntoDB = async (payload) => {
   }
 };
 const getRoomsByQuery = async (query) => {
+  console.log(query);
   const roomQuery = new QueryBuilder(Room.find(), query)
     .search()
     .filter()
