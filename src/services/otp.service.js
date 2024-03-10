@@ -21,14 +21,19 @@ const createAnOtpIntoDB = async ({ email, type }) => {
     otp: decryptOtp,
     expiresAt,
   };
-  await Otp.findOneAndDelete({ email: email, type: type });
-  const result = await Otp.create(otpObj);
-  if (!result) {
-    throw new AppError(
-      httpStatus.UNPROCESSABLE_ENTITY,
-      "something went wrong. otp not generated!.please try again!"
-    );
-  }
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    await Otp.deleteMany({ email: email, type: type }, { session });
+
+    const result = await Otp.create(otpObj);
+    if (!result) {
+      throw new AppError(
+        httpStatus.UNPROCESSABLE_ENTITY,
+        "something went wrong. otp not generated!.please try again!"
+      );
+    }
+  } catch (err) {}
   await sendEmail(
     email,
     "Your One-Time Verification Code",
@@ -136,19 +141,23 @@ const verifyForgetPasswordOtp = async (payload) => {
   const findOtp = await Otp.findOne({
     email: payload?.email,
     type: "forgotPassWordVerification",
-  });
+  }).sort({ createdAt: -1 });
   if (!findOtp) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "otp information not found.please resend it"
     );
   }
+  console.log("findotp", findOtp);
 
   const { expiresAt } = findOtp;
   // check is otp expired
   const isOtpExpired = await Otp.isOtpExpired(expiresAt);
   if (isOtpExpired) {
-    await Otp.deleteOne({ email: payload?.email, expiresAt: expiresAt });
+    await Otp.deleteOne({
+      email: payload?.email,
+      type: "forgotPassWordVerification",
+    });
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "otp has expired. please resend it"
@@ -161,32 +170,18 @@ const verifyForgetPasswordOtp = async (payload) => {
       httpStatus.BAD_REQUEST,
       "otp did not match.plese try again"
     );
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    const updateOtp = await Otp.findByIdAndUpdate(
-      findOtp?._id,
-      {
-        $set: {
-          verificationStatus: true,
-        },
+
+  const updateOtp = await Otp.findByIdAndUpdate(
+    findOtp?._id,
+    {
+      $set: {
+        verificationStatus: true,
       },
-      { new: true, session }
-    );
-    if (!updateOtp) {
-      throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
-    }
-    const deleteOtp = await Otp.findByIdAndDelete(findOtp?._id, { session });
-    if (!deleteOtp) {
-      throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
-    }
-    await session.commitTransaction();
-    await session.endSession();
-    return updateOtp;
-  } catch (err) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error(err);
+    },
+    { new: true }
+  );
+  if (!updateOtp) {
+    throw new AppError(httpStatus.BAD_REQUEST, "something went wrong");
   }
   return updateOtp;
 };

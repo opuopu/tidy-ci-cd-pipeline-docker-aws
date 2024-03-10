@@ -24,7 +24,7 @@ router.post(
 router.post("/refreshToken", authControllers.refreshToken);
 router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
-  "/resetPassword",
+  "/reset-password",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   authControllers.resetPassword
 );

@@ -151,22 +151,33 @@ const refreshToken = async (token) => {
 };
 
 // forget password
-const forgotPassword = async ({ otp, email, password }) => {
-  console.log(email);
+const forgotPassword = async ({ email, newPassword, confirmPassword }) => {
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email");
   }
-
+  const isOtpVerified = await Otp.findOne({
+    email: email,
+    type: "forgotPassWordVerification",
+  }).sort({ createdAt: -1 });
+  if (!isOtpVerified?.verificationStatus) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized");
+  }
+  if (newPassword !== confirmPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "confirm password and new password does not match"
+    );
+  }
   const hasedPassword = await bcrypt.hash(
-    password,
+    newPassword,
     Number(config.bcrypt_salt_rounds)
   );
-  let result;
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    result = await User.findByIdAndUpdate(
+    const result = await User.findByIdAndUpdate(
       isUserExist?._id,
       {
         password: hasedPassword,
@@ -174,7 +185,13 @@ const forgotPassword = async ({ otp, email, password }) => {
       },
       { new: true, session }
     );
-
+    if (!result) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "something went wrong. please try again "
+      );
+    }
+    await Otp.deleteMany({ email: email, type: "forgotPassWordVerification" });
     await session.commitTransaction();
     await session.endSession();
     return result;
@@ -189,7 +206,8 @@ const forgotPassword = async ({ otp, email, password }) => {
 
 const resetPassword = async (id, payload) => {
   const { oldPassword, newPassword } = payload;
-  const isUserExist = await User.findByIdAndUpdate(id);
+
+  const isUserExist = await User.checkUserExistById(id);
   if (!isUserExist) {
     throw new AppError(httpStatus.BAD_REQUEST, "User Information Not Found");
   }
@@ -198,11 +216,17 @@ const resetPassword = async (id, payload) => {
     isUserExist?.password,
     oldPassword
   );
+  console.log(isPasswordMatched);
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "Old Password Does Not Match");
   }
-
-  const hashedPassword = bcrypt.hash(
+  if (payload?.newPassword !== payload?.confirmPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "new password and confirm password does not match"
+    );
+  }
+  const hashedPassword = await bcrypt.hash(
     newPassword,
     Number(config.bcrypt_salt_rounds)
   );
