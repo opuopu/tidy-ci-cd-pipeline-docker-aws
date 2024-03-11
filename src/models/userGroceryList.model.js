@@ -1,6 +1,10 @@
 import { Schema, Types, model } from "mongoose";
 const userGrocerySchema = new Schema(
   {
+    title: {
+      type: String,
+      default: "Buy Grocries",
+    },
     homeOwner: {
       type: Types.ObjectId,
       ref: "User",
