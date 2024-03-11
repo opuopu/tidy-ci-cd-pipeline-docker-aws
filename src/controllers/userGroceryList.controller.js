@@ -4,8 +4,16 @@ import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 
 const insertUserGroceryListsIntoDB = catchAsync(async (req, res) => {
-  const { userId } = req.user;
-  req.body.homeOwner = userId;
+  const { userId, role } = req.user;
+  if (role === "homeowner") {
+    req.body.homeOwner = userId;
+  } else if (role === "employee") {
+    req.body.employee = userId;
+  }
+  if (req?.user?.homeOwnerId) {
+    req.body.homeOwner = req?.user?.homeOwnerId;
+  }
+
   const result = await userGroceryListServices.insertUserGroceryListsIntoDB(
     req.body
   );
@@ -16,15 +24,19 @@ const insertUserGroceryListsIntoDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getUserGroceryLists = catchAsync(async (req, res) => {
+const getgroceryListByEmployee = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  req.query.homeOwner = userId;
-  const result = await userGroceryListServices.getUserGroceryLists(req.query);
+  req.query.employee = userId;
+
+  const result = await userGroceryListServices.getgroceryListByEmployee(
+    req.query
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "grocery Lists Retrived successfully",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const getuserSingleGroceryList = catchAsync(async (req, res) => {
@@ -41,6 +53,9 @@ const getuserSingleGroceryList = catchAsync(async (req, res) => {
   });
 });
 const findGroceryFromGroceryLists = catchAsync(async (req, res) => {
+  console.log(req.body);
+  const { userId } = req?.user;
+  req.query.homeOwner = userId;
   const result = await userGroceryListServices.findGroceryFromGroceryLists(
     req.query
   );
@@ -51,8 +66,27 @@ const findGroceryFromGroceryLists = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const deleteUserGrocery = catchAsync(async (req, res) => {
-  const result = await userGroceryListServices.deleteUserGrocery(req.params.id);
+
+const updateUserGroceryList = catchAsync(async (req, res) => {
+  const { role, userId } = req.user;
+  if (role === "employee") {
+    req.body.employee = userId;
+  }
+  const result = await userGroceryListServices.updateUserGroceryList(
+    req.params.id,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "grocery list updated successfully",
+    data: result,
+  });
+});
+const deleteGroceryFromList = catchAsync(async (req, res) => {
+  const result = await userGroceryListServices.deleteGroceryFromList(
+    req.params.id
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -60,25 +94,46 @@ const deleteUserGrocery = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const deleteSingleGrocery = catchAsync(async (req, res) => {
-  const result = await userGroceryListServices.deleteSingleGrocery(
+const markAsBusy = catchAsync(async (req, res) => {
+  const { homeOwnerId } = req?.user || {};
+  if (homeOwnerId) {
+    req.body.homeOwner = homeOwnerId;
+  }
+  const result = await userGroceryListServices.markAsBusy(
     req.params.id,
-    req.body.groceryId
+    req.body
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "grocery item removed   successfully",
+    message: "grocery list marked as busy successfully",
     data: result,
   });
 });
-
+const markAsComplete = catchAsync(async (req, res) => {
+  const { homeOwnerId } = req?.user || {};
+  if (homeOwnerId) {
+    req.body.homeOwner = homeOwnerId;
+  }
+  const result = await userGroceryListServices.markAsComplete(
+    req.params.id,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "grocery list marked as complete successfully",
+    data: result,
+  });
+});
 const userGroceryListControllers = {
   insertUserGroceryListsIntoDB,
   findGroceryFromGroceryLists,
-  getUserGroceryLists,
+  getgroceryListByEmployee,
   getuserSingleGroceryList,
-  deleteUserGrocery,
-  deleteSingleGrocery,
+  updateUserGroceryList,
+  deleteGroceryFromList,
+  markAsBusy,
+  markAsComplete,
 };
 export default userGroceryListControllers;

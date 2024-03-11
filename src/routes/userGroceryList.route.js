@@ -6,18 +6,19 @@ const router = express.Router();
 
 router.post(
   "/",
-  auth(USER_ROLE.HOMEOWNER),
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.HOMEOWNER),
   userGroceryListControllers.insertUserGroceryListsIntoDB
 );
+
 router.get(
-  "/all",
+  "/homeOwner",
   auth(USER_ROLE.HOMEOWNER),
-  userGroceryListControllers.getUserGroceryLists
+  userGroceryListControllers.findGroceryFromGroceryLists
 );
 router.get(
-  "/",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  userGroceryListControllers.findGroceryFromGroceryLists
+  "/employee",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.getgroceryListByEmployee
 );
 router.get(
   "/:id",
@@ -26,13 +27,23 @@ router.get(
 );
 router.patch(
   "/:id",
-  auth(USER_ROLE.HOMEOWNER),
-  userGroceryListControllers.deleteSingleGrocery
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.updateUserGroceryList
 );
 router.delete(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
-  userGroceryListControllers.deleteUserGrocery
+  userGroceryListControllers.deleteGroceryFromList
+);
+router.patch(
+  "/busy/:id",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.markAsBusy
+);
+router.patch(
+  "/completed/:id",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.markAsComplete
 );
 const userGroceryListsRoutes = router;
 export default userGroceryListsRoutes;

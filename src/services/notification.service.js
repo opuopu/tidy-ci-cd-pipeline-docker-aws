@@ -1,7 +1,7 @@
 import QueryBuilder from "../builder/QueryBuilder.js";
 import Notification from "../models/notification.model.js";
-const insertNotificationIntoDB = async (payload) => {
-  const result = await Notification.create(payload);
+const insertNotificationIntoDB = async (payload, session) => {
+  const result = await Notification.create(payload, { session });
   return result;
 };
 const getUserSpecificNotifications = async (userId) => {

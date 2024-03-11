@@ -17,6 +17,7 @@ const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
 const signupEmployeeIntoDb = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.body.homeOwner = userId;
+
   if (req?.file) {
     req.body.image = createFileDetails("employee", req?.file?.filename);
   }
@@ -31,6 +32,15 @@ const signupEmployeeIntoDb = catchAsync(async (req, res) => {
 });
 const SigninHomeOwner = catchAsync(async (req, res) => {
   const result = await authServices.SigninHomeOwner(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "user Sign In successfully",
+    data: result,
+  });
+});
+const SigninEmployee = catchAsync(async (req, res) => {
+  const result = await authServices.SigninEmployee(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -76,5 +86,6 @@ const authControllers = {
   refreshToken,
   forgotPassword,
   resetPassword,
+  SigninEmployee,
 };
 export default authControllers;

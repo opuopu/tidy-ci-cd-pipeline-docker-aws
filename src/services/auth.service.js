@@ -14,6 +14,7 @@ import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
 
 import Employee from "../models/employee.model.js";
+import { generateNewEmployeeId } from "../utils/employee.utils.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -33,6 +34,7 @@ const signupHomeOwnerIntoDB = async (payload) => {
 const signupEmployeeIntoDb = async (payload) => {
   const { email, password, phoneNumber, needPasswordChange, ...others } =
     payload;
+  const id = await generateNewEmployeeId();
   const authObj = {
     email,
     password,
@@ -40,6 +42,7 @@ const signupEmployeeIntoDb = async (payload) => {
     needPasswordChange: true,
     role: "employee",
     verified: true,
+    id: id,
   };
   const user = await User.isUserExist(email);
   if (user) {
@@ -61,6 +64,7 @@ const signupEmployeeIntoDb = async (payload) => {
         {
           ...others,
           user: result[0]?._id,
+          id: id,
         },
       ],
       { session }
@@ -109,6 +113,61 @@ const SigninHomeOwner = async (payload) => {
     role: user.role,
     id: user?.id,
     verified: user.verified,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in
+  );
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in
+  );
+
+  return {
+    user: others,
+    accessToken,
+    refreshToken,
+  };
+};
+// signi
+const SigninEmployee = async (payload) => {
+  const { email, password } = payload;
+  const user = await User.isUserExist(email);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  }
+  if (user?.role !== "employee") {
+    throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
+  }
+  const findEmployee = await Employee.findOne({ id: user?.id });
+  if (!findEmployee) {
+    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  }
+  const { password: hasedPassword } = user;
+  const isPasswordMatched = await User.isPasswordMatched(
+    password,
+    hasedPassword
+  );
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.BAD_REQUEST, "password do not match!");
+  }
+  // if (!verified) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "please verify your account first!"
+  //   );
+  // }
+
+  const { password: newsdfd, ...others } = user.toObject();
+  const jwtPayload = {
+    userId: user?._id,
+    email: user.email,
+    role: user.role,
+    id: user?.id,
+    verified: user?.verified,
+    homeOwnerId: findEmployee?.homeOwner,
   };
   const accessToken = createToken(
     jwtPayload,
@@ -246,5 +305,6 @@ const authServices = {
   resetPassword,
   signupHomeOwnerIntoDB,
   signupEmployeeIntoDb,
+  SigninEmployee,
 };
 export default authServices;

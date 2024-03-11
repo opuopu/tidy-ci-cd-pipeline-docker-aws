@@ -16,6 +16,7 @@ router.post(
   auth(USER_ROLE.HOMEOWNER),
   authControllers.signupEmployeeIntoDb
 );
+router.post("/employee/signin", authControllers.SigninEmployee);
 router.post(
   "/homeOwner/signIn",
   // validateRequest(authValidation.singinSchema),
