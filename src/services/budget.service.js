@@ -1,10 +1,13 @@
-import dayjs from "dayjs";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import Budget from "../models/budget.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
+import mongoose from "mongoose";
+import Expense from "../models/expense.model.js";
 const insertBudgetIntoDB = async (payload) => {
   const { month } = payload;
+  const [year, mon] = month.split("-");
+  const formatedDate = `${year}-${mon}-01T00:00:00.000Z`;
   const isExistBudget = await Budget.findOne({
     user: payload?.user,
     category: payload?.category,
@@ -15,13 +18,16 @@ const insertBudgetIntoDB = async (payload) => {
       "Budget Already Exist With This Category"
     );
   }
-  const formattedDate = dayjs(month).format("01-MM-YYYY");
-  payload.month = formattedDate;
+
+  payload.month = new Date(formatedDate);
   const result = await Budget.create(payload);
   return result;
 };
 const getbudgetsByQuery = async (query) => {
-  const budgetModel = new QueryBuilder(Budget.find(), query)
+  const budgetModel = new QueryBuilder(
+    Budget.find().populate("category"),
+    query
+  )
     .search()
     .filter()
     .paginate()
@@ -35,31 +41,72 @@ const getbudgetsByQuery = async (query) => {
   };
 };
 const getSingleBudget = async (id) => {
-  const result = await Budget.findById(id);
+  const result = await Budget.findById(id).populate("category");
   return result;
 };
 
 const updateBudget = async (id, userId, payload) => {
-  const result = await Budget.findOneAndUpdate(
-    { _id: id, user: userId },
-    payload,
-    {
-      new: true,
+  const result = await Budget.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const deleteBudget = async (id) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const result = await Budget.findByIdAndDelete(id, { session });
+    if (!result) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete budget");
     }
-  );
+    const deleteExpenses = await Expense.deleteMany(
+      { budget: id },
+      { session }
+    );
+    if (!deleteExpenses.acknowledged) {
+      throw new AppError(httpStatus.BAD_REQUEST, "failed to delete expenses");
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+const budgetVsexpense = async (query) => {
+  const { month, user } = query;
+  const userObjectId = new mongoose.Types.ObjectId(user);
+  const [year, monthValue] = month.split("-").map(Number);
+  const startDate = new Date(Date.UTC(year, monthValue - 1, 1));
+  const endDate = new Date(Date.UTC(year, monthValue, 0));
+  const result = await Budget.aggregate([
+    {
+      $match: {
+        user: userObjectId,
+        month: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      },
+    },
+    {
+      $project: {
+        budgetAmount: "$amount",
+        totalExpenseAmount: { $subtract: ["$amount", "$remainingAmount"] },
+      },
+    },
+  ]);
   return result;
 };
-
-const deleteBudget = async (id, userId) => {
-  const result = await Budget.findOneAndDelete({ _id: id, user: userId });
-  return result;
-};
-
 const budgetServices = {
   insertBudgetIntoDB,
   getbudgetsByQuery,
   getSingleBudget,
   updateBudget,
   deleteBudget,
+  budgetVsexpense,
 };
 export default budgetServices;

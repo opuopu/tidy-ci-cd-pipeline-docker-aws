@@ -4,20 +4,38 @@ import AppError from "../errors/AppError.js";
 import Room from "../models/room.model.js";
 import mongoose from "mongoose";
 import Home from "../models/home.model.js";
+import HomeOwner from "../models/homeOwner.model.js";
 const inserRoomIntoDB = async (payload) => {
   const session = await mongoose.startSession();
   const homeObj = {
     title: payload?.homeTitle,
     user: payload?.user,
   };
-
   try {
     session.startTransaction();
     const createHome = await Home.create([homeObj], { session });
+    console.log(createHome);
     if (!createHome[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "Home Creation Failed. Please Try Again!"
+      );
+    }
+    const updateHomeOwner = await HomeOwner.findOneAndUpdate(
+      {
+        id: payload?.id,
+      },
+      {
+        $addToSet: {
+          homes: createHome[0]?._id,
+        },
+      },
+      { new: true, session }
+    );
+    if (!updateHomeOwner) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "failed to add home. plase try again"
       );
     }
     const rooms = payload.rooms.map((room) => ({
@@ -38,10 +56,12 @@ const inserRoomIntoDB = async (payload) => {
   } catch (err) {
     await session.abortTransaction();
     await session.endSession();
+
     throw new Error(err);
   }
 };
 const getRoomsByQuery = async (query) => {
+  console.log(query);
   const roomQuery = new QueryBuilder(Room.find(), query)
     .search()
     .filter()

@@ -5,12 +5,17 @@ const userSchema = new Schema(
   {
     phoneNumber: {
       type: Number,
-      required: [true, "phone number is required"],
-      unique: true,
+      // required: [true, "phone number is required"],
+      // unique: true,
     },
     email: {
       type: String,
       required: [true, "email is required"],
+      unique: true,
+    },
+    id: {
+      type: String,
+      required: [true, "id is required"],
       unique: true,
     },
     password: {
@@ -28,10 +33,11 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: ["homeowner", "employee"],
+      required: [true, "role is required"],
     },
     verified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   {
@@ -48,9 +54,11 @@ userSchema.pre("save", async function (next) {
 
   next();
 });
-
 userSchema.statics.isUserExist = async function (email) {
   return await User.findOne({ email: email }).select("+password");
+};
+userSchema.statics.isDuplicatePhone = async function (phoneNumber) {
+  return await User.findOne({ phoneNumber: phoneNumber });
 };
 userSchema.statics.checkUserExistById = async function (id) {
   return await User.findOne({ _id: id }).select("+password");

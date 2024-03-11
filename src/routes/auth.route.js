@@ -16,15 +16,16 @@ router.post(
   auth(USER_ROLE.HOMEOWNER),
   authControllers.signupEmployeeIntoDb
 );
+router.post("/employee/signin", authControllers.SigninEmployee);
 router.post(
-  "/signin",
-  validateRequest(authValidation.singinSchema),
-  authControllers.signIn
+  "/homeOwner/signIn",
+  // validateRequest(authValidation.singinSchema),
+  authControllers.SigninHomeOwner
 );
 router.post("/refreshToken", authControllers.refreshToken);
-+router.post("/forgot-password", authControllers.forgotPassword);
+router.post("/forgot-password", authControllers.forgotPassword);
 router.patch(
-  "/resetPassword",
+  "/reset-password",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   authControllers.resetPassword
 );

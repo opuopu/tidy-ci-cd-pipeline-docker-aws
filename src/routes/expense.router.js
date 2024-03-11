@@ -9,6 +9,7 @@ router.post(
   auth(USER_ROLE.HOMEOWNER),
   expenseController.insertExpenseIntoDb
 );
+
 router.get(
   "/:budgetId",
   auth(USER_ROLE.HOMEOWNER),

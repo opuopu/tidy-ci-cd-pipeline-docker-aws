@@ -4,6 +4,7 @@ const GroceryCategorySchema = new Schema(
     title: {
       type: String,
       required: [true, "grocery title is required"],
+      trim: true,
     },
   },
   {

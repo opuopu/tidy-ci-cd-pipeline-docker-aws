@@ -5,22 +5,28 @@ const userGrocerySchema = new Schema(
       type: Types.ObjectId,
       ref: "User",
     },
-    assignedEmployee: {
+    employee: {
       type: String,
       ref: "Employee",
     },
     groceryLists: [
       {
-        type: Types.ObjectId,
-        ref: "GroceryList",
+        type: String,
       },
     ],
     date: {
       type: Date,
     },
-    completed: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["pending", "busy", "completed"],
+      default: "pending",
+    },
+    instruction: {
+      type: String,
+    },
+    note: {
+      type: String,
     },
   },
   {

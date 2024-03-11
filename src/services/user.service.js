@@ -7,22 +7,38 @@ import { deleteFile } from "../utils/file.utils.js";
 import Employee from "../models/employee.model.js";
 // get me
 const getme = async (userId, role) => {
-  console.log(userId, role);
   let result;
   if (role === "homeowner") {
     result = await HomeOwner.findOne({ user: userId }).populate("user");
   } else if (role === "employee") {
     result = await Employee.findOne({ user: userId }).populate("user");
   }
-  return result;
+  const formatedObject = {
+    _id: result.user?._id,
+    name: result?.name,
+    image: result?.image,
+    email: result?.user?.email,
+    phoneNumber: result?.user?.phoneNumber,
+    role: result?.user?.role,
+    refferalCode: result?.refferalCode,
+    homes: result?.homes,
+  };
+  return formatedObject;
 };
 // update user profile
-const updateMyProfile = async (userId, role, payload) => {
+const updateMyProfile = async (usermail, userId, role, payload) => {
   const { password, role: clientRole, phoneNumber, email, ...others } = payload;
   const authObj = {
     email,
     phoneNumber,
   };
+  const isExistUser = await User.isUserExist(email);
+  if (usermail !== email && isExistUser) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "user already exists with this email."
+    );
+  }
   if (password || clientRole) {
     throw new AppError(
       httpStatus.BAD_REQUEST,

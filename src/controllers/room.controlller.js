@@ -3,8 +3,9 @@ import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import roomServices from "../services/room.service.js";
 const inserRoomIntoDB = catchAsync(async (req, res) => {
-  const { userId } = req?.user;
+  const { userId, id } = req?.user;
   req.body.user = userId;
+  req.body.id = id;
   const result = await roomServices.inserRoomIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -14,8 +15,6 @@ const inserRoomIntoDB = catchAsync(async (req, res) => {
   });
 });
 const getRoomsByQuery = catchAsync(async (req, res) => {
-  const { userId } = req.user;
-  req.query.user = userId;
   const result = await roomServices.getRoomsByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,

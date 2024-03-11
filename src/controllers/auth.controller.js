@@ -11,12 +11,13 @@ const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "please verify your otp now",
-    data: result,
+    data: result ?? null,
   });
 });
 const signupEmployeeIntoDb = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.body.homeOwner = userId;
+
   if (req?.file) {
     req.body.image = createFileDetails("employee", req?.file?.filename);
   }
@@ -29,8 +30,17 @@ const signupEmployeeIntoDb = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const signIn = catchAsync(async (req, res) => {
-  const result = await authServices.SignInUser(req.body);
+const SigninHomeOwner = catchAsync(async (req, res) => {
+  const result = await authServices.SigninHomeOwner(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "user Sign In successfully",
+    data: result,
+  });
+});
+const SigninEmployee = catchAsync(async (req, res) => {
+  const result = await authServices.SigninEmployee(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -72,9 +82,10 @@ const resetPassword = catchAsync(async (req, res) => {
 const authControllers = {
   signupHomeOwnerIntoDB,
   signupEmployeeIntoDb,
-  signIn,
+  SigninHomeOwner,
   refreshToken,
   forgotPassword,
   resetPassword,
+  SigninEmployee,
 };
 export default authControllers;

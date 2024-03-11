@@ -14,77 +14,27 @@ import HomeOwner from "../models/homeOwner.model.js";
 import bcrypt from "bcrypt";
 
 import Employee from "../models/employee.model.js";
+import { generateNewEmployeeId } from "../utils/employee.utils.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
   const user = await User.isUserExist(email);
-  if (user && user?.verified) {
+  if (user) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "user already exist with the same email!"
     );
   }
-  const session = await mongoose.startSession();
-  let result;
-  try {
-    session.startTransaction();
-    if (user && !user?.verified) {
-      const deleteUser = await User.findOneAndDelete(
-        { email: email },
-        { session }
-      );
-      if (!deleteUser) {
-        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
-      }
-      const deletehomeOwner = await HomeOwner.findOneAndDelete(
-        {
-          user: user?._id,
-        },
-        { session }
-      );
-      if (!deletehomeOwner) {
-        throw new AppError(httpStatus.BAD_REQUEST, "someting went wrong!");
-      }
-    }
-
-    const authObj = {
-      email: payload.email,
-      password: payload.password,
-      role: payload.role,
-      phoneNumber: payload.phoneNumber,
-    };
-
-    const createnewUser = await User.create([authObj], { session });
-    if (!createnewUser.length) {
-      throw new AppError(httpStatus.BAD_REQUEST, "failed to create user");
-    }
-
-    const finalObj = {
-      ...payload,
-      user: createnewUser[0]?._id,
-      refferalCode: generateRefferalCode(),
-    };
-    result = await HomeOwner.create([finalObj], { session });
-    setTimeout(async () => {
-      await otpServices.createAnOtpIntoDB({
-        email,
-        type: "signupVerification",
-      });
-    }, 1000);
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (err) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error(err);
-  }
-
-  return result[0];
+  await otpServices.createAnOtpIntoDB({
+    email,
+    type: "signupVerification",
+  });
 };
 // signup employee
 const signupEmployeeIntoDb = async (payload) => {
   const { email, password, phoneNumber, needPasswordChange, ...others } =
     payload;
+  const id = await generateNewEmployeeId();
   const authObj = {
     email,
     password,
@@ -92,6 +42,7 @@ const signupEmployeeIntoDb = async (payload) => {
     needPasswordChange: true,
     role: "employee",
     verified: true,
+    id: id,
   };
   const user = await User.isUserExist(email);
   if (user) {
@@ -113,6 +64,7 @@ const signupEmployeeIntoDb = async (payload) => {
         {
           ...others,
           user: result[0]?._id,
+          id: id,
         },
       ],
       { session }
@@ -130,13 +82,16 @@ const signupEmployeeIntoDb = async (payload) => {
   return result[0];
 };
 // signi
-const SignInUser = async (payload) => {
+const SigninHomeOwner = async (payload) => {
   const { email, password } = payload;
   const user = await User.isUserExist(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
   }
-  const { password: hasedPassword, verified } = user;
+  if (user?.role !== "homeowner") {
+    throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
+  }
+  const { password: hasedPassword } = user;
   const isPasswordMatched = await User.isPasswordMatched(
     password,
     hasedPassword
@@ -144,17 +99,19 @@ const SignInUser = async (payload) => {
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match!");
   }
-  if (!verified) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "please verify your account first!"
-    );
-  }
+  // if (!verified) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "please verify your account first!"
+  //   );
+  // }
 
+  const { password: newsdfd, ...others } = user.toObject();
   const jwtPayload = {
-    userId: user.id,
+    userId: user?._id,
     email: user.email,
     role: user.role,
+    id: user?.id,
     verified: user.verified,
   };
   const accessToken = createToken(
@@ -169,10 +126,67 @@ const SignInUser = async (payload) => {
   );
 
   return {
+    user: others,
     accessToken,
     refreshToken,
   };
 };
+// signi
+const SigninEmployee = async (payload) => {
+  const { email, password } = payload;
+  const user = await User.isUserExist(email);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  }
+  if (user?.role !== "employee") {
+    throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
+  }
+  const findEmployee = await Employee.findOne({ id: user?.id });
+  if (!findEmployee) {
+    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  }
+  const { password: hasedPassword } = user;
+  const isPasswordMatched = await User.isPasswordMatched(
+    password,
+    hasedPassword
+  );
+  if (!isPasswordMatched) {
+    throw new AppError(httpStatus.BAD_REQUEST, "password do not match!");
+  }
+  // if (!verified) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "please verify your account first!"
+  //   );
+  // }
+
+  const { password: newsdfd, ...others } = user.toObject();
+  const jwtPayload = {
+    userId: user?._id,
+    email: user.email,
+    role: user.role,
+    id: user?.id,
+    verified: user?.verified,
+    homeOwnerId: findEmployee?.homeOwner,
+  };
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret,
+    config.jwt_access_expires_in
+  );
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret,
+    config.jwt_refresh_expires_in
+  );
+
+  return {
+    user: others,
+    accessToken,
+    refreshToken,
+  };
+};
+
 // refresh token
 const refreshToken = async (token) => {
   const decodeToken = verifyToken(token, config.jwt_refresh_secret);
@@ -196,43 +210,33 @@ const refreshToken = async (token) => {
 };
 
 // forget password
-const forgotPassword = async ({ otp, email, password }) => {
-  // check if user exist
+const forgotPassword = async ({ email, newPassword, confirmPassword }) => {
   const isUserExist = await User.isUserExist(email);
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email");
   }
-  // check is otp exist
-  const isOtpExist = await Otp.isExistOtp(email, "forgotPassWordVerification");
-  if (!isOtpExist) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Otp Information Not Found. Please Resend It"
-    );
+  const isOtpVerified = await Otp.findOne({
+    email: email,
+    type: "forgotPassWordVerification",
+  }).sort({ createdAt: -1 });
+  if (!isOtpVerified?.verificationStatus) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "you are not authorized");
   }
-  // check is otp expires
-  const isOtpExpires = await Otp.isOtpExpired(isOtpExist?.expiresAt);
-  if (isOtpExpires) {
-    await Otp.findByIdAndDelete(isOtpExist?._id);
+  if (newPassword !== confirmPassword) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "OTP has expired. Please request a new one and try again"
+      "confirm password and new password does not match"
     );
   }
-  // check is otp matched
-  const isOtpMatched = await Otp.isOtpMatched(otp, isOtpExist?.otp);
-  if (!isOtpMatched) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid OTP");
-  }
   const hasedPassword = await bcrypt.hash(
-    password,
+    newPassword,
     Number(config.bcrypt_salt_rounds)
   );
-  let result;
+
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    result = await User.findByIdAndUpdate(
+    const result = await User.findByIdAndUpdate(
       isUserExist?._id,
       {
         password: hasedPassword,
@@ -240,11 +244,16 @@ const forgotPassword = async ({ otp, email, password }) => {
       },
       { new: true, session }
     );
-    if (result) {
-      await Otp.findByIdAndDelete(isOtpExist?._id, { session });
+    if (!result) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "something went wrong. please try again "
+      );
     }
+    await Otp.deleteMany({ email: email, type: "forgotPassWordVerification" });
     await session.commitTransaction();
     await session.endSession();
+    return result;
   } catch (err) {
     await session.abortTransaction();
     await session.endSession();
@@ -256,7 +265,8 @@ const forgotPassword = async ({ otp, email, password }) => {
 
 const resetPassword = async (id, payload) => {
   const { oldPassword, newPassword } = payload;
-  const isUserExist = await User.findByIdAndUpdate(id);
+
+  const isUserExist = await User.checkUserExistById(id);
   if (!isUserExist) {
     throw new AppError(httpStatus.BAD_REQUEST, "User Information Not Found");
   }
@@ -265,11 +275,17 @@ const resetPassword = async (id, payload) => {
     isUserExist?.password,
     oldPassword
   );
+  console.log(isPasswordMatched);
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "Old Password Does Not Match");
   }
-
-  const hashedPassword = bcrypt.hash(
+  if (payload?.newPassword !== payload?.confirmPassword) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "new password and confirm password does not match"
+    );
+  }
+  const hashedPassword = await bcrypt.hash(
     newPassword,
     Number(config.bcrypt_salt_rounds)
   );
@@ -283,11 +299,12 @@ const resetPassword = async (id, payload) => {
 };
 
 const authServices = {
-  SignInUser,
+  SigninHomeOwner,
   refreshToken,
   forgotPassword,
   resetPassword,
   signupHomeOwnerIntoDB,
   signupEmployeeIntoDb,
+  SigninEmployee,
 };
 export default authServices;

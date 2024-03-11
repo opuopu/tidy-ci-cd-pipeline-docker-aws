@@ -25,7 +25,7 @@ const budgetSchema = new Schema(
       default: 0,
     },
     month: {
-      type: String,
+      type: Date,
       required: [true, "month is required"],
     },
     progress: {

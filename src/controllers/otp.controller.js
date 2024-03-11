@@ -8,10 +8,10 @@ const createAnOtp = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Please Check Your Email",
-    data: result,
+    data: result ?? null,
   });
 });
-const veriFySignupOtp = catchAsync(async (req, res, next) => {
+const veriFySignupOtp = catchAsync(async (req, res) => {
   const result = await otpServices.veriFySignupOtp(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -20,9 +20,18 @@ const veriFySignupOtp = catchAsync(async (req, res, next) => {
     data: result ? result : null,
   });
 });
-
+const verifyForgetPasswordOtp = catchAsync(async (req, res) => {
+  const result = await otpServices.verifyForgetPasswordOtp(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "OTP verified successfully",
+    data: result ? result : null,
+  });
+});
 const otpControllers = {
   createAnOtp,
   veriFySignupOtp,
+  verifyForgetPasswordOtp,
 };
 export default otpControllers;

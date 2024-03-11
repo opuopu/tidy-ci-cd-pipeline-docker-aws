@@ -53,21 +53,30 @@ const updateBudget = catchAsync(async (req, res) => {
   });
 });
 const deleteBudget = catchAsync(async (req, res) => {
-  const { userId } = req.user;
-  const result = await budgetServices.deleteBudget(req.params.id, userId);
+  const result = await budgetServices.deleteBudget(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "budget updated successfully",
+    message: "budget deleted successfully",
     data: result,
   });
 });
-
+const budgetVsExpense = catchAsync(async (req, res) => {
+  req.query.user = req?.user?.userId;
+  const result = await budgetServices.budgetVsexpense(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Budget Vs Expense Retrived successfully",
+    data: result,
+  });
+});
 const budgetControllers = {
   insertBudgetIntoDB,
   getbudgetsByQuery,
   getsingleBudget,
   updateBudget,
   deleteBudget,
+  budgetVsExpense,
 };
 export default budgetControllers;

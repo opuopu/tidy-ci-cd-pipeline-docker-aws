@@ -16,6 +16,10 @@ const employeeSchema = new Schema(
       ref: "User",
       required: [true, "user inforamtion is required"],
     },
+    id: {
+      type: String,
+      required: [true, "employee id is required"],
+    },
     image: {
       type: String,
     },

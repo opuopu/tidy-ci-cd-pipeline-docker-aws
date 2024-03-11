@@ -13,8 +13,9 @@ const insertExpenseIntoDb = catchAsync(async (req, res) => {
   });
 });
 const getBudgetWiseExpenses = catchAsync(async (req, res) => {
-  req.query.budget = req.params.budgetId;
-  const result = await expenseServices.getBudgetWiseExpenses(req.query);
+  const result = await expenseServices.getBudgetWiseExpenses(
+    req.params.budgetId
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
