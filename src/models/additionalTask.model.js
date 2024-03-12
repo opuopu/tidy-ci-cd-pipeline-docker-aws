@@ -27,8 +27,8 @@ const AdditionalTaskSchema = new Schema(
       type: String,
       default: "morning",
     },
-    date: {
-      type: String,
+    assignedDate: {
+      type: Date,
       required: [true, "task date is required"],
     },
     recurrence: {
@@ -42,15 +42,11 @@ const AdditionalTaskSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "completed", "busy"],
+      enum: ["pending", "completed", "busy", "ongoing"],
       default: "pending",
     },
     instruction: {
       type: String,
-    },
-    nextOccurrence: {
-      type: Date,
-      required: [true, "next next Occurrence is required"],
     },
     preferableTime: {
       date: {

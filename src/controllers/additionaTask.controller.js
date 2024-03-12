@@ -12,8 +12,7 @@ const insertAdditionalTaskIntoDb = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "additional tasks added successfully",
-    data: result?.result,
-    meta: result?.meta,
+    data: result,
   });
 });
 const getAllAdditionalTaskByHomeOwner = catchAsync(async (req, res) => {

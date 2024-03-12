@@ -6,17 +6,22 @@ import { emitMessage } from "../utils/socket.utils.js";
 import { nextMonth, nextWeekDay } from "../utils/schedule.utils.js";
 import notificationServices from "./notification.service.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
+import TaskCompletationHistory from "../models/taskCompleteHistory.model.js";
+import AppError from "../errors/AppError.js";
 const insertAdditionalTaskIntoDb = async (payload) => {
-  const { date } = payload;
-  if (payload.recurrence === "weekly") {
-    payload.nextOccurrence = nextWeekDay(date);
-  } else if (payload.recurrence === "monthly") {
-    payload.nextOccurrence = nextMonth(date);
+  const { assignedDate } = payload;
+  let status;
+  if (payload.recurrence === "weekly" || payload.recurrence === "monthly") {
+    status = "ongoing";
   }
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const result = await AdditionalTask.create(payload);
+    const result = await AdditionalTask.create({
+      ...payload,
+      nextOccurrence: assignedDate,
+      status,
+    });
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }
@@ -130,40 +135,41 @@ const markAsBusy = async (id, payload) => {
 };
 const markAsComplete = async (id, payload) => {
   const session = await mongoose.startSession();
+  const findTask = await AdditionalTask.findById(id);
+  if (findTask?.recurrence === "weekly") {
+    payload.nextOccurrence = nextWeekDay(findTask?.nextOccurrence);
+  } else if (findTask?.recurrence === "monthly") {
+    payload.nextOccurrence = nextMonth(findTask?.nextOccurrence);
+  } else if (findTask?.recurrence === "onetime") {
+    payload.status = "complete";
+  }
   try {
     session.startTransaction();
-    const result = await AdditionalTask.findByIdAndUpdate(
-      id,
-      [
-        {
-          $set: {
-            status: "completed",
-            nextOccurrence: {
-              $cond: {
-                if: { $eq: ["$recurrence", "weekly"] },
-                then: nextWeekDay("$nextOccurrence"),
-                else: {
-                  $cond: {
-                    if: { $eq: ["$recurrence", "monthly"] },
-                    then: nextMonth("$nextOccurrence"),
-                    else: null,
-                  },
-                },
-              },
-            },
-          },
-        },
-      ],
-      {
-        new: true,
-        session,
-      }
-    );
+    const result = await AdditionalTask.findByIdAndUpdate(id, payload, {
+      new: true,
+      session,
+    });
 
     if (!result) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "failed to update. please try again"
+      );
+    }
+    const insertIntoHistory = await TaskCompletationHistory.create(
+      [
+        {
+          task: result?._id,
+          date: new Date(),
+          type: "additional",
+        },
+      ],
+      { session }
+    );
+    if (!insertIntoHistory) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "failed to update history.please try again"
       );
     }
     emitMessage(result?.homeOwner, TaskNotifcationMessage.completed);
