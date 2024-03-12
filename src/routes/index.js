@@ -19,6 +19,7 @@ import employeeRoutes from "./employee.route.js";
 import taskScheduleRoutes from "./taskSchedule.route.js";
 import FavouriteRecipeRoutes from "./FavouriteRecipe.route.js";
 import expenseRouter from "./expense.router.js";
+import additionalTaskRoutes from "./additionalTask.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -75,6 +76,10 @@ const moduleRoutes = [
   {
     path: "/expenses",
     route: expenseRouter,
+  },
+  {
+    path: "/additional-task",
+    route: additionalTaskRoutes,
   },
   {
     path: "/user-grocery-lists",

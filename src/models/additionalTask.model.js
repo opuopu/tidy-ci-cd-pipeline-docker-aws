@@ -1,3 +1,5 @@
+import { Schema, model } from "mongoose";
+
 const AdditionalTaskSchema = new Schema(
   {
     task: {
@@ -21,7 +23,7 @@ const AdditionalTaskSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Room",
     },
-    time: {
+    timeOfDay: {
       type: String,
       default: "morning",
     },
@@ -49,6 +51,14 @@ const AdditionalTaskSchema = new Schema(
     nextOccurrence: {
       type: Date,
       required: [true, "next next Occurrence is required"],
+    },
+    preferableTime: {
+      date: {
+        type: Date,
+      },
+      time: {
+        type: Date,
+      },
     },
   },
 
