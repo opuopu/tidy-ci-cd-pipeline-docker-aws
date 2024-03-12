@@ -15,6 +15,7 @@ const getme = catchAsync(async (req, res) => {
   });
 });
 const updateMyProfile = catchAsync(async (req, res) => {
+  console.log(req.body);
   const { userId, role, email } = req.user;
   if (req?.file) {
     req.body.image = createFileDetails("profile", req?.file?.filename);
