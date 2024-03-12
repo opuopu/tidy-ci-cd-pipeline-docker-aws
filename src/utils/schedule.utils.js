@@ -1,4 +1,5 @@
 import { addDays, addMonths, addWeeks, nextDay, parseISO } from "date-fns";
+import dayjs from "dayjs";
 
 export const hasDateAndTimeConflict = (assignSchedules, newSchedules) => {
   console.log("goignh", assignSchedules, newSchedules);
@@ -77,3 +78,9 @@ export const getNextOccurrence = (task) => {
 };
 
 // Sat | Sun  | Mon | Tue | Wed | Tue | Wed |Thu | Fri
+export const nextWeekDay = (date) => {
+  return dayjs(date).add(7, "day").toDate();
+};
+export const nextMonth = (date) => {
+  return dayjs(date).add(1, "month").toDate();
+};

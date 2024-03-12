@@ -6,6 +6,7 @@ import { createFileDetails } from "../utils/file.utils.js";
 
 const signupHomeOwnerIntoDB = catchAsync(async (req, res, next) => {
   req.body.role = "homeowner";
+  req.body.image = "/uploads/profile/image.png";
   const result = await authServices.signupHomeOwnerIntoDB(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
