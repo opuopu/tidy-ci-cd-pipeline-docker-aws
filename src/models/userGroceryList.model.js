@@ -8,10 +8,12 @@ const userGrocerySchema = new Schema(
     homeOwner: {
       type: Types.ObjectId,
       ref: "User",
+      required: [true, "homwowner information is required"],
     },
     employee: {
       type: String,
       ref: "Employee",
+      required: [true, "employee information is required"],
     },
     groceryLists: [
       {

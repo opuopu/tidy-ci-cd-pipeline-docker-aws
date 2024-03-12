@@ -28,6 +28,7 @@ const getme = async (userId, role) => {
 // update user profile
 const updateMyProfile = async (usermail, userId, role, payload) => {
   const { password, role: clientRole, phoneNumber, email, ...others } = payload;
+  console.log(payload);
   const authObj = {
     email,
     phoneNumber,
