@@ -20,13 +20,14 @@ const insertAdditionalTaskIntoDb = async (payload) => {
     status = "ongoing";
     nextOccurrence = nextMonth(workingDate);
   }
+  console.log(nextOccurrence);
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     const result = await AdditionalTask.create({
       ...payload,
-      nextOccurrence,
-      status,
+      nextOccurrence: nextOccurrence,
+      status: status,
     });
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
@@ -308,7 +309,6 @@ const UpdateAdditionalTask = async (id, payload) => {
       new: true,
       session,
     });
-    console.log(result);
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }

@@ -39,7 +39,6 @@ const insertUserGroceryListsIntoDB = async (payload) => {
 };
 
 const findGroceryFromGroceryLists = async (query) => {
-  console.log(query);
   const goceryListModel = new QueryBuilder(UserGroceryList.find(), query)
     .search(["name"])
     .filter()

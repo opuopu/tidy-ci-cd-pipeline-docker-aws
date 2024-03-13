@@ -54,7 +54,6 @@ const AdditionalTaskSchema = new Schema(
     },
     nextOccurrence: {
       type: Date,
-      required: [true, "nextOccurrence is required"],
     },
   },
 
