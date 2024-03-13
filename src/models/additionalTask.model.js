@@ -27,7 +27,8 @@ const AdditionalTaskSchema = new Schema(
       type: String,
       default: "morning",
     },
-    assignedDate: {
+
+    workingDate: {
       type: Date,
       required: [true, "task date is required"],
     },
@@ -48,13 +49,12 @@ const AdditionalTaskSchema = new Schema(
     instruction: {
       type: String,
     },
-    preferableTime: {
-      date: {
-        type: Date,
-      },
-      time: {
-        type: Date,
-      },
+    preferableDate: {
+      type: Date,
+    },
+    nextOccurrence: {
+      type: Date,
+      required: [true, "nextOccurrence is required"],
     },
   },
 
