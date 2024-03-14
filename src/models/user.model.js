@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import config from "../config/index.js";
+import { calculateRemainingDays, dateCompare } from "../utils/date.utils.js";
 const userSchema = new Schema(
   {
     phoneNumber: {
@@ -35,17 +36,40 @@ const userSchema = new Schema(
       enum: ["homeowner", "employee"],
       required: [true, "role is required"],
     },
+
     verified: {
       type: Boolean,
       default: true,
     },
+    trial: {
+      type: String,
+      enum: ["free", "premium"],
+      default: "free",
+    },
+    trialExpirationDate: {
+      type: Date,
+      required: [true, "trial expiration date is required"],
+    },
   },
   {
-    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
   }
 );
+userSchema.virtual("trialStatus").get(function () {
+  const currentDate = new Date();
+  const trialExpirationDate = this.trialExpirationDate;
+  return dateCompare(currentDate, trialExpirationDate);
+});
+userSchema.virtual("trialRemainingDate").get(function () {
+  const currentDate = new Date();
+  const trialExpirationDate = this.trialExpirationDate;
+  return calculateRemainingDays(currentDate, trialExpirationDate);
+});
 userSchema.pre("save", async function (next) {
   const user = this; // doc
+
   // hashing password and save into DB
   user.password = await bcrypt.hash(
     user.password,
@@ -69,4 +93,5 @@ userSchema.statics.isPasswordMatched = async function (
 ) {
   return await bcrypt.compare(plainPassword, hashPassword);
 };
+
 export const User = model("User", userSchema);

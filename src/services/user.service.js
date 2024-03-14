@@ -5,9 +5,11 @@ import mongoose from "mongoose";
 import HomeOwner from "../models/homeOwner.model.js";
 import { deleteFile } from "../utils/file.utils.js";
 import Employee from "../models/employee.model.js";
+import { calculateRemainingDays, dateCompare } from "../utils/date.utils.js";
 // get me
 const getme = async (userId, role) => {
   let result;
+  const date = new Date();
   if (role === "homeowner") {
     result = await HomeOwner.findOne({ user: userId }).populate("user");
   } else if (role === "employee") {
@@ -22,6 +24,13 @@ const getme = async (userId, role) => {
     role: result?.user?.role,
     refferalCode: result?.refferalCode,
     homes: result?.homes,
+    trial: result?.user?.trial,
+    trialExpirationDate: result?.user?.trialExpirationDate,
+    trialStatus: dateCompare(date, result?.user?.trialExpirationDate),
+    trialRemainingDate: calculateRemainingDays(
+      date,
+      result?.user?.trialExpirationDate
+    ),
   };
   return formatedObject;
 };

@@ -10,6 +10,7 @@ import { generateOtp } from "../utils/OtpGenerator.js";
 import { createToken, generateRefferalCode } from "../utils/auth.utils.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import { generateNewHomeOwnerId } from "../utils/homeowner.utils.js";
+import { nextFiveDay } from "../utils/date.utils.js";
 
 const createAnOtpIntoDB = async ({ email, type }) => {
   const otp = generateOtp();
@@ -43,6 +44,7 @@ const createAnOtpIntoDB = async ({ email, type }) => {
 };
 const veriFySignupOtp = async (payload) => {
   // check is exist otp
+  const date = new Date();
   const isExistOtp = await Otp.isExistOtp(payload?.email, "signupVerification");
   if (!isExistOtp) {
     throw new AppError(
@@ -77,8 +79,8 @@ const veriFySignupOtp = async (payload) => {
       email: payload.email,
       password: payload.password,
       role: payload.role,
-
       id: id,
+      trialExpirationDate: nextFiveDay(date),
     };
     const createUser = await User.create([authObj], { session });
     if (!createUser[0]) {
@@ -148,7 +150,6 @@ const verifyForgetPasswordOtp = async (payload) => {
       "otp information not found.please resend it"
     );
   }
-  console.log("findotp", findOtp);
 
   const { expiresAt } = findOtp;
   // check is otp expired

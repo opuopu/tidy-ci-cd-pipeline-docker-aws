@@ -21,6 +21,8 @@ import FavouriteRecipeRoutes from "./FavouriteRecipe.route.js";
 import expenseRouter from "./expense.router.js";
 import additionalTaskRoutes from "./additionalTask.route.js";
 import packagteRoutes from "./package.route.js";
+import Subscription from "../models/subscription.model.js";
+import SubscriptionRoutes from "./subscription.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -107,6 +109,10 @@ const moduleRoutes = [
   {
     path: "/packages",
     route: packagteRoutes,
+  },
+  {
+    path: "/subscriptions",
+    route: SubscriptionRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

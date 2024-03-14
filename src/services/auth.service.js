@@ -3,14 +3,10 @@ import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import otpServices from "./otp.service.js";
 import mongoose from "mongoose";
-import {
-  createToken,
-  generateRefferalCode,
-  verifyToken,
-} from "../utils/auth.utils.js";
+import { createToken, verifyToken } from "../utils/auth.utils.js";
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
-import HomeOwner from "../models/homeOwner.model.js";
+
 import bcrypt from "bcrypt";
 
 import Employee from "../models/employee.model.js";
@@ -74,12 +70,12 @@ const signupEmployeeIntoDb = async (payload) => {
     }
     await session.commitTransaction();
     await session.endSession();
+    return result[0];
   } catch (err) {
     await session.abortTransaction();
     await session.endSession();
     throw new Error(err);
   }
-  return result[0];
 };
 // signi
 const SigninHomeOwner = async (payload) => {
@@ -105,8 +101,9 @@ const SigninHomeOwner = async (payload) => {
   //     "please verify your account first!"
   //   );
   // }
-
+  const date = new Date();
   const { password: newsdfd, ...others } = user.toObject();
+
   const jwtPayload = {
     userId: user?._id,
     email: user.email,
@@ -126,7 +123,7 @@ const SigninHomeOwner = async (payload) => {
   );
 
   return {
-    user: others,
+    user: user,
     accessToken,
     refreshToken,
   };

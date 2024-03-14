@@ -84,3 +84,6 @@ export const nextWeekDay = (date) => {
 export const nextMonth = (date) => {
   return dayjs(date).add(1, "month").toDate();
 };
+export const nextYear = (date) => {
+  return dayjs(date).add(1, "year").toDate();
+};
