@@ -33,6 +33,7 @@ const signupEmployeeIntoDb = catchAsync(async (req, res) => {
 });
 const SigninHomeOwner = catchAsync(async (req, res) => {
   const result = await authServices.SigninHomeOwner(req.body);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

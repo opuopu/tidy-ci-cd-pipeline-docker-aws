@@ -1,0 +1,1 @@
+step1. fetch payment intent api in payment page from frontend .............................................................................<br/> 2. first of all create a payment intent api and send client sercret

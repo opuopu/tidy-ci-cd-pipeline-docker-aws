@@ -12,8 +12,12 @@ const PackageSchema = new Schema(
     },
     duration: {
       type: String,
+      enum: ["yearly", "monthly"],
       required: [true, "package duration is required"],
     },
+    // free: {
+    //   type: String,
+    // },
   },
 
   {

@@ -31,6 +31,11 @@ const homeOwnerSchema = new Schema(
     address: {
       type: String,
     },
+
+    package: {
+      type: Schema.Types.ObjectId,
+      ref: "Subscription",
+    },
   },
   { timestamps: true }
 );
