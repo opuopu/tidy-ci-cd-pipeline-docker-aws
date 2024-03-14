@@ -21,14 +21,35 @@ router.get(
   additionalTaskControllers.getAllAdditionalTaskByEmployee
 );
 router.patch(
-  "/busy",
+  "/:id",
+  auth(USER_ROLE.HOMEOWNER),
+  additionalTaskControllers.UpdateAdditionalTask
+);
+router.patch(
+  "/re-schedule/:id",
+  auth(USER_ROLE.HOMEOWNER),
+  additionalTaskControllers.UpdateAdditionalTask
+);
+
+router.patch(
+  "/busy/:id",
   auth(USER_ROLE.EMPLOYEE),
-  additionalTaskControllers.getAllAdditionalTaskByEmployee
+  additionalTaskControllers.markAsBusy
 );
 router.patch(
   "/completed/:id",
   auth(USER_ROLE.EMPLOYEE),
   additionalTaskControllers.markAsComplete
+);
+router.patch(
+  "/approve-reschedule/:id",
+  auth(USER_ROLE.HOMEOWNER),
+  additionalTaskControllers.AprooveReschedule
+);
+router.patch(
+  "/assign-to-others",
+  auth(USER_ROLE.HOMEOWNER),
+  additionalTaskControllers.reAsignToOthers
 );
 
 const additionalTaskRoutes = router;

@@ -12,8 +12,7 @@ const insertAdditionalTaskIntoDb = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "additional tasks added successfully",
-    data: result?.result,
-    meta: result?.meta,
+    data: result,
   });
 });
 const getAllAdditionalTaskByHomeOwner = catchAsync(async (req, res) => {
@@ -77,6 +76,36 @@ const markAsComplete = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const AprooveReschedule = catchAsync(async (req, res) => {
+  const result = await additionalTaskServices.AprooveReschedule(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "re schedule request is approved",
+    data: result,
+  });
+});
+const reAsignToOthers = catchAsync(async (req, res) => {
+  const result = await additionalTaskServices.AssignToothers(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "task assigned successfully",
+    data: result,
+  });
+});
+const UpdateAdditionalTask = catchAsync(async (req, res) => {
+  const result = await additionalTaskServices.UpdateAdditionalTask(
+    req.params.id,
+    req.body
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "task assigned successfully",
+    data: result,
+  });
+});
 const additionalTaskControllers = {
   insertAdditionalTaskIntoDb,
   getAllAdditionalTaskByHomeOwner,
@@ -84,6 +113,9 @@ const additionalTaskControllers = {
   deleteAdditionalTask,
   markAsBusy,
   markAsComplete,
+  AprooveReschedule,
+  reAsignToOthers,
+  UpdateAdditionalTask,
 };
 
 export default additionalTaskControllers;

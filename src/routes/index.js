@@ -20,6 +20,7 @@ import taskScheduleRoutes from "./taskSchedule.route.js";
 import FavouriteRecipeRoutes from "./FavouriteRecipe.route.js";
 import expenseRouter from "./expense.router.js";
 import additionalTaskRoutes from "./additionalTask.route.js";
+import packagteRoutes from "./package.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -42,12 +43,10 @@ const moduleRoutes = [
     path: "/homes",
     route: homeRoutes,
   },
-
   {
     path: "/rooms",
     route: roomRoutes,
   },
-
   { path: "/grocery-categories", route: groceryCategoryRoutes },
   {
     path: "/grocery-lists",
@@ -104,6 +103,10 @@ const moduleRoutes = [
   {
     path: "/employees",
     route: employeeRoutes,
+  },
+  {
+    path: "/packages",
+    route: packagteRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
