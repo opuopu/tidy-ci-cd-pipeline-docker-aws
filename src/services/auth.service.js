@@ -14,6 +14,9 @@ import { generateNewEmployeeId } from "../utils/employee.utils.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
+  if (!email) {
+    throw new AppError(httpStatus.BAD_REQUEST, "please provide information");
+  }
   const user = await User.isUserExist(email);
   if (user) {
     throw new AppError(
