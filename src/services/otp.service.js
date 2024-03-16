@@ -45,7 +45,11 @@ const createAnOtpIntoDB = async ({ email, type }) => {
 const veriFySignupOtp = async (payload) => {
   // check is exist otp
   const date = new Date();
-  const isExistOtp = await Otp.isExistOtp(payload?.email, "signupVerification");
+  const isExistOtp = await Otp.findOne({
+    email: payload?.email,
+    type: "signupVerification",
+  }).sort({ createdAt: -1 });
+
   if (!isExistOtp) {
     throw new AppError(
       httpStatus.NOT_FOUND,

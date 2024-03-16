@@ -13,10 +13,14 @@ const findLastHomeOwnerId = async () => {
 export const generateNewHomeOwnerId = async () => {
   let currentId = (0).toString();
   const lastHomeOwner = await findLastHomeOwnerId();
+
   if (lastHomeOwner) {
     currentId = lastHomeOwner.substring(10);
   }
+  console.log(currentId);
   let incrementId = (Number(currentId) + 1).toString().padStart(4, "0");
+
   incrementId = `homeowner-${incrementId}`;
+
   return incrementId;
 };

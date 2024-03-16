@@ -22,7 +22,6 @@ const createPaymentIntent = async (payload) => {
 };
 
 const BuySubscription = async (payload) => {
-  console.log(payload);
   const findPackage = await Packages.findById(payload?.package);
 
   const findUserSubscription = await Subscription.findOne({

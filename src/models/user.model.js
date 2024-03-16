@@ -17,7 +17,7 @@ const userSchema = new Schema(
     id: {
       type: String,
       required: [true, "id is required"],
-      unique: true,
+      // unique: true,
     },
     password: {
       type: String,
@@ -52,9 +52,10 @@ const userSchema = new Schema(
     },
   },
   {
-    toJSON: {
-      virtuals: true,
-    },
+    timestamps: true,
+    // toJSON: {
+    //   virtuals: true,
+    // },
   }
 );
 userSchema.virtual("trialStatus").get(function () {
