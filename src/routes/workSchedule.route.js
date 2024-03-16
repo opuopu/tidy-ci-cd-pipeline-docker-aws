@@ -2,7 +2,7 @@ import express from "express";
 
 import auth from "../middlewares/auth.js";
 import { USER_ROLE } from "../constant/user.role.js";
-import taskScheduleController from "../controllers/taskSchedule.controller.js";
+import taskScheduleController from "../controllers/workSchedule.controller.js";
 
 const router = express.Router();
 router.post(
@@ -51,5 +51,5 @@ router.post(
   taskScheduleController.scheduleTask
 );
 
-const taskScheduleRoutes = router;
-export default taskScheduleRoutes;
+const workScheduleRoutes = router;
+export default workScheduleRoutes;

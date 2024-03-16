@@ -17,6 +17,6 @@ export const generateNewHomeOwnerId = async () => {
     currentId = lastHomeOwner.substring(10);
   }
   let incrementId = (Number(currentId) + 1).toString().padStart(4, "0");
-  incrementId = `homeOwner-${incrementId}`;
+  incrementId = `homeowner-${incrementId}`;
   return incrementId;
 };
