@@ -271,11 +271,8 @@ const resetPassword = async (id, payload) => {
     throw new AppError(httpStatus.BAD_REQUEST, "User Information Not Found");
   }
 
-  const isPasswordMatched = await bcrypt.compare(
-    isUserExist?.password,
-    oldPassword
-  );
-  console.log(isPasswordMatched);
+  console.log(isUserExist);
+  const isPasswordMatched = bcrypt.compare(isUserExist?.password, oldPassword);
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "Old Password Does Not Match");
   }
