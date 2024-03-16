@@ -75,6 +75,7 @@ const veriFySignupOtp = async (payload) => {
   try {
     session.startTransaction();
     const id = await generateNewHomeOwnerId();
+    console.log(id);
     const authObj = {
       email: payload.email,
       password: payload.password,

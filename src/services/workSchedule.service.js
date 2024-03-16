@@ -8,53 +8,44 @@ import {
 
 import QueryBuilder from "../builder/QueryBuilder.js";
 
-import TaskSchedule from "../models/taskSchedule.model.js";
+import WorkSchedule from "../models/workSchedule.js";
 import {
   getNextOccurrence,
   hasDateAndTimeConflict,
   hasRecurrenceConflict,
+  hasTimeConflict,
 } from "../utils/schedule.utils.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import Notification from "../models/notification.model.js";
 import { emitMessage } from "../utils/socket.utils.js";
-import schedule from "node-schedule";
+
 const insertUserTaskIntoDB = async (payload) => {
-  const { employee } = payload;
-  const oldSchedule = await TaskSchedule.find({
+  const { employee, workingDays } = payload;
+  const oldSchedule = await WorkSchedule.find({
     employee,
-  }).select("date startTime endTime recurrence");
+    workingDays: { $in: workingDays },
+  }).select("startTime endTime");
+  payload.assignedDate = new Date();
   const newSchedule = {
-    date: payload?.date,
     startTime: payload?.startTime,
     endTime: payload?.endTime,
-    recurrence: payload?.recurrence,
   };
+  console.log(oldSchedule);
   // check same date same time conflict issue
-  if (hasDateAndTimeConflict(oldSchedule, newSchedule)) {
-    console.log("clicked");
+  if (hasTimeConflict(oldSchedule, newSchedule)) {
     throw new AppError(
       httpStatus.CONFLICT,
-      "date and time conflict! Employee is already scheduled during this date and time."
+      "time conflict! Employee is already scheduled during this time."
     );
   }
-  // check same time and reccurence conflict issue
-  if (hasRecurrenceConflict(oldSchedule, newSchedule)) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      "reccurence conflict! Employee is already scheduled during this time and reccurence."
-    );
-  }
-  // check only time conflict issue
-  const result = await TaskSchedule.create({
-    ...payload,
-    nextOccurrence: new Date(`${payload?.date}T${payload?.startTime}`),
-  });
+
+  const result = await WorkSchedule.create(payload);
   return result;
 };
 const getAllTaskSchedule = async (query) => {
   const userTaskModel = new QueryBuilder(
-    TaskSchedule.find({}).populate("groceries"),
+    WorkSchedule.find({}).populate("groceries"),
     query
   )
     .search()
@@ -71,7 +62,7 @@ const getAllTaskSchedule = async (query) => {
   };
 };
 const getSingleTask = async (id) => {
-  const result = await TaskSchedule.findById(id).populate(
+  const result = await WorkSchedule.findById(id).populate(
     "employees room groceries homeOwner"
   );
   return result;
@@ -84,7 +75,7 @@ const reAssignTask = async (id, payload) => {
       "Please Provide employee & date and time information"
     );
   }
-  const oldSchedule = await TaskSchedule.find({
+  const oldSchedule = await WorkSchedule.find({
     employee,
   }).select("date startTime endTime recurrence");
   const newSchedule = {
@@ -107,7 +98,7 @@ const reAssignTask = async (id, payload) => {
       "reccurence conflict! Employee is already scheduled during this time and reccurence."
     );
   }
-  const result = await TaskSchedule.findByIdAndUpdate(
+  const result = await WorkSchedule.findByIdAndUpdate(
     id,
     {
       ...payload,
@@ -120,7 +111,7 @@ const reAssignTask = async (id, payload) => {
   return result;
 };
 const changeTaskStatus = async (id, payload) => {
-  const result = await TaskSchedule.findByIdAndUpdate(
+  const result = await WorkSchedule.findByIdAndUpdate(
     id,
     {
       $set: {
@@ -136,7 +127,7 @@ const changeTaskStatus = async (id, payload) => {
   return result;
 };
 const updateTask = async (id, payload) => {
-  const result = await TaskSchedule.findByIdAndUpdate(
+  const result = await WorkSchedule.findByIdAndUpdate(
     id,
     {
       $set: {
@@ -150,11 +141,11 @@ const updateTask = async (id, payload) => {
 };
 
 const deleteTask = async (id) => {
-  const result = await TaskSchedule.findByIdAndDelete(id);
+  const result = await WorkSchedule.findByIdAndDelete(id);
   return result;
 };
 const addGroceriesIntoTask = async (id, payload) => {
-  const result = await TaskSchedule.findByIdAndUpdate(
+  const result = await WorkSchedule.findByIdAndUpdate(
     id,
     {
       $addToSet: {
@@ -166,7 +157,7 @@ const addGroceriesIntoTask = async (id, payload) => {
   return result;
 };
 const removeGroceriesFromTask = async (id, payload) => {
-  const result = await TaskSchedule.findByIdAndUpdate(
+  const result = await WorkSchedule.findByIdAndUpdate(
     id,
     {
       $pull: {
@@ -183,7 +174,7 @@ const sentReminder = async () => {
   const date = new Date();
   const currentDate = addMinutes(date, 5);
   const formatedTime = format(currentDate, "HH:mm");
-  const tasks = await TaskSchedule.aggregate([
+  const tasks = await WorkSchedule.aggregate([
     { $match: { startTime: formatedTime } },
     {
       $group: {
