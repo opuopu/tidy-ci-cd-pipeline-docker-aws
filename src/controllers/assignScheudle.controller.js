@@ -13,9 +13,18 @@ const insertScheduleIntoDb = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getAssignedSchedule = catchAsync(async (req, res) => {
+const getAllSchedules = catchAsync(async (req, res) => {
+  const result = await AssignScheduleServices.getAllAssignSchedule(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "assign schedule retrived successfully",
+    data: result,
+  });
+});
+const getAssignedScheduleById = catchAsync(async (req, res) => {
   const result = await AssignScheduleServices.getAssignedSchedule(
-    req.params.employeeId
+    req.params.id
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -39,6 +48,8 @@ const updateAssignSchedule = catchAsync(async (req, res) => {
 
 const AssignScheduleControllers = {
   insertScheduleIntoDb,
+  getAssignedScheduleById,
   updateAssignSchedule,
+  getAllSchedules,
 };
 export default AssignScheduleControllers;
