@@ -5,20 +5,21 @@ import sendResponse from "../utils/sendResponse.js";
 
 const getUserSpecificNotifications = catchAsync(async (req, res) => {
   const { userId } = req.user;
+  req.query.receiver = userId;
   const result = await notificationServices.getUserSpecificNotifications(
-    userId
+    req.query
   );
   sendResponse(res, {
-    status: httpStatus.OK,
+    statusCode: httpStatus.OK,
     message: "notifications retrived successfully",
-    data: result?.data,
+    data: result?.result,
     meta: result?.meta,
   });
 });
 const deleteNotification = catchAsync(async (req, res) => {
   const result = await notificationServices.deleteNotification(req?.parmas?.id);
   sendResponse(res, {
-    status: httpStatus.OK,
+    statusCode: httpStatus.OK,
     message: "notifications deleted successfully",
     data: result,
   });
