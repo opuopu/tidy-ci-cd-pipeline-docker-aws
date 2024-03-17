@@ -34,11 +34,6 @@ const AssignWorkScheduleSchema = new Schema(
       enum: ["daily"],
       default: "daily",
     },
-    status: {
-      type: String,
-      enum: ["pending", "ongoing", "completed", "busy"],
-      default: "ongoing",
-    },
   },
 
   {

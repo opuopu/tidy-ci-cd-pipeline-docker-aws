@@ -4,6 +4,10 @@ const insertNotificationIntoDB = async (payload, session) => {
   const result = await Notification.create(payload, { session });
   return result;
 };
+const insertNotificationIntoDBv2 = async (payload) => {
+  const result = await Notification.create(payload);
+  return result;
+};
 const getUserSpecificNotifications = async (userId) => {
   const query = {};
   if (userId) query["receiver"] = userId;
@@ -30,6 +34,7 @@ const deleteNotification = async (id) => {
 const notificationServices = {
   insertNotificationIntoDB,
   getUserSpecificNotifications,
+  insertNotificationIntoDBv2,
   deleteNotification,
 };
 export default notificationServices;

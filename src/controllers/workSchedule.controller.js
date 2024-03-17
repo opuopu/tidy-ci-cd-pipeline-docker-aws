@@ -1,9 +1,7 @@
 import httpStatus from "http-status";
-
 import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import taskScheduleService from "../services/workSchedule.service.js";
-import dayjs from "dayjs";
 const insertUserTaskIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.body.homeOwner = userId;
@@ -11,106 +9,67 @@ const insertUserTaskIntoDB = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "user task created successfully",
+    message: "task assigned successfully",
     data: result,
   });
 });
-const getAllTaskSchedule = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.getAllTaskSchedule(req.query);
+const insertBreakTimeIntoDb = catchAsync(async (req, res) => {
+  const { userId } = req.user;
+  req.body.homeOwner = userId;
+  const result = await taskScheduleService.insertBreakTimeIntoDb(req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "task schedules retrived successfully",
-    data: result?.result,
-    meta: result?.meta,
-  });
-});
-const getSingleTaskSchedule = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.getSingleTask(req.params.id);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "task schedule retrived successfully",
+    message: "break time added successfully",
     data: result,
   });
 });
-const addGroceriesIntoTask = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.addGroceriesIntoTask(
+const getallWorkSchedules = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.getAllWorkSchedule(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "work schedules retrived successfully",
+    data: result,
+  });
+});
+const getSingleWorkSchedule = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.getsingleWorkSchedule(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "work schedules retrived successfully",
+    data: result,
+  });
+});
+const updateSchedule = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.updateSchedule(
     req.params.id,
     req.body
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "groceries added successfully",
+    message: "work schedule updated successfully",
     data: result,
   });
 });
-const changeTaskStatus = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.changeTaskStatus(
-    req.params.id,
-    req.body
-  );
+const deleteSingleSchedule = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.deleteSingleSchedule(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "task status updated successfully",
-    data: result,
-  });
-});
-const reAssignTask = catchAsync(async (req, res) => {
-  req.body.date = dayjs(req?.body?.date).format("YYYY-MM-DD");
-  const result = await taskScheduleService.reAssignTask(
-    req.params.id,
-    req.body
-  );
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "task re asigned  successfully",
-    data: result,
-  });
-});
-const removeGroceriesFromTask = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.removeGroceriesFromTask(
-    req.params.id,
-    req.body
-  );
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "groceries deleted successfully",
-    data: result,
-  });
-});
-const updateTaskSchedule = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.updateTask(req.params.id, req.body);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "task schedule updated successfully",
-    data: result,
-  });
-});
-const scheduleTask = catchAsync(async (req, res) => {
-  const result = await taskScheduleService.sentReminder();
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "task scheduled successfully",
+    message: "work schedule deleted successfully",
     data: result,
   });
 });
 
 const taskScheduleController = {
   insertUserTaskIntoDB,
-  getAllTaskSchedule,
-  getSingleTaskSchedule,
-  addGroceriesIntoTask,
-  removeGroceriesFromTask,
-  changeTaskStatus,
-  reAssignTask,
-  updateTaskSchedule,
-  scheduleTask,
+  insertBreakTimeIntoDb,
+  getallWorkSchedules,
+  getSingleWorkSchedule,
+  updateSchedule,
+  deleteSingleSchedule,
 };
 export default taskScheduleController;

@@ -12,3 +12,9 @@ export const calculateRemainingDays = (startDate, endDate) => {
   const diffInDays = end.diff(start, "day");
   return diffInDays;
 };
+export const formatTime = (startTime, endTime) => {
+  return {
+    startTime: dayjs(startTime, "HH:mm").format("hh:mm A"),
+    endTime: dayjs(endTime, "HH:mm").format("hh:mm A"),
+  };
+};
