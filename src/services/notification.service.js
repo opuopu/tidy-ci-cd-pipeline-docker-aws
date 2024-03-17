@@ -8,9 +8,7 @@ const insertNotificationIntoDBv2 = async (payload) => {
   const result = await Notification.create(payload);
   return result;
 };
-const getUserSpecificNotifications = async (userId) => {
-  const query = {};
-  if (userId) query["receiver"] = userId;
+const getUserSpecificNotifications = async (query) => {
   const notificationQuery = new QueryBuilder(Notification.find({}), query)
     .search()
     .filter()
