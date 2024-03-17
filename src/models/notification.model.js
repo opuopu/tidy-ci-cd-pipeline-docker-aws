@@ -17,7 +17,7 @@ const notificationSchema = new Schema(
       required: true,
     },
     type: {
-      enum: ["payment", "reminder", "task", "additional"],
+      enum: ["payment", "reminder", "task", "additional", "work"],
     },
   },
 

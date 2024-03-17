@@ -18,11 +18,6 @@ const AssignWorkScheduleSchema = new Schema(
       required: [true, "assign date is required"],
       default: new Date(),
     },
-    // breakTime: [
-    //   {
-    //     type: String,
-    //   },
-    // ],
     workingDays: [
       {
         type: String,
@@ -30,7 +25,6 @@ const AssignWorkScheduleSchema = new Schema(
       },
     ],
     weekend: [{ type: String, enum: days }],
-
     reminder: {
       type: Boolean,
       default: true,
@@ -39,11 +33,6 @@ const AssignWorkScheduleSchema = new Schema(
       type: String,
       enum: ["daily"],
       default: "daily",
-    },
-    status: {
-      type: String,
-      enum: ["pending", "ongoing", "completed", "busy"],
-      default: "ongoing",
     },
   },
 

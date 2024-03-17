@@ -4,28 +4,19 @@ export const AssignWorkScheduleSchema = new Schema({});
 
 const WorkScheduleSchema = new Schema(
   {
+    schedule: {
+      type: Schema.Types.ObjectId,
+      ref: "AssignSchedule",
+      required: [true, "assign schedule id is required"],
+    },
     task: {
       type: String,
       required: [true, "task is required"],
-    },
-    homeOwner: {
-      type: Schema.Types.ObjectId,
-      ref: "homeOwner",
-      required: [true, "homeowner information is required"],
-    },
-    employee: {
-      type: Schema.Types.ObjectId,
-      ref: "Employee",
-      required: [true, "employee information is required"],
     },
     room: {
       type: Schema.Types.ObjectId,
       ref: "Room",
       // required: [true, "room is required"],
-    },
-    assignedDate: {
-      type: String,
-      required: [true, "task date is required"],
     },
     startTime: {
       type: String, // Start time as a string
@@ -35,29 +26,10 @@ const WorkScheduleSchema = new Schema(
       type: String, // End time as a string
       required: [true, "End Time Is Required"],
     },
-    breakTime: {
-      type: String, // break time as a string
-    },
-    workingDays: [
-      {
-        type: String,
-        enum: days,
-      },
-    ],
-    weekend: [{ type: String, enum: days }],
-    recurrence: {
+    type: {
       type: String,
-      enum: ["daily", "weekly", "monthly", "onetime"],
-      default: "daily",
-    },
-    reminder: {
-      type: Boolean,
-      default: true,
-    },
-    recurrence: {
-      type: String,
-      enum: ["daily"],
-      default: "daily",
+      enum: ["work", "break"],
+      default: "work",
     },
     status: {
       type: String,
@@ -68,7 +40,6 @@ const WorkScheduleSchema = new Schema(
       type: String,
       enum: ["sick", "busy", "personal_reason", "other"],
     },
-
     note: {
       type: String,
     },

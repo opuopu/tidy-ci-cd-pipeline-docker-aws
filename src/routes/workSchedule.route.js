@@ -10,45 +10,30 @@ router.post(
   auth(USER_ROLE.HOMEOWNER),
   taskScheduleController.insertUserTaskIntoDB
 );
+router.post(
+  "/break-time",
+  auth(USER_ROLE.HOMEOWNER),
+  taskScheduleController.insertBreakTimeIntoDb
+);
 router.get(
   "/",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  taskScheduleController.getAllTaskSchedule
+  taskScheduleController.getallWorkSchedules
 );
 router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  taskScheduleController.getAllTaskSchedule
+  taskScheduleController.getSingleWorkSchedule
 );
 router.patch(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
-  taskScheduleController.updateTaskSchedule
+  taskScheduleController.updateSchedule
 );
-router.patch(
-  "/add-groceries/:id",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  taskScheduleController.addGroceriesIntoTask
-);
-router.patch(
-  "/remove-groceries/:id",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  taskScheduleController.removeGroceriesFromTask
-);
-router.patch(
-  "/update-status/:id",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
-  taskScheduleController.changeTaskStatus
-);
-router.patch(
-  "/re-assign/:id",
+router.delete(
+  "/:id",
   auth(USER_ROLE.HOMEOWNER),
-  taskScheduleController.reAssignTask
-);
-router.post(
-  "/schedule",
-  auth(USER_ROLE.HOMEOWNER),
-  taskScheduleController.scheduleTask
+  taskScheduleController.deleteSingleSchedule
 );
 
 const workScheduleRoutes = router;

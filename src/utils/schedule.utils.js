@@ -2,7 +2,6 @@ import { addDays, addMonths, addWeeks, nextDay, parseISO } from "date-fns";
 import dayjs from "dayjs";
 
 export const hasDateAndTimeConflict = (assignSchedules, newSchedules) => {
-  console.log("goignh", assignSchedules, newSchedules);
   for (const schedule of assignSchedules) {
     const existingStartTime = new Date(
       `${schedule.date}T${schedule.startTime}`
