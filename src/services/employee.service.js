@@ -2,6 +2,8 @@ import httpStatus from "http-status";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import AppError from "../errors/AppError.js";
 import Employee from "../models/employee.model.js";
+import AdditionalTask from "../models/additionalTask.model.js";
+import UserGroceryList from "../models/userGroceryList.model.js";
 
 const getAllEmployees = async (query) => {
   const EmployeeQuery = new QueryBuilder(Employee.find({}), query)
@@ -35,10 +37,27 @@ const deleteEmployee = async (id) => {
   const result = await Employee.findByIdAndDelete(id);
   return result;
 };
+
+const GetTotalAdditionalTask = async (query) => {
+  if (!query?.employee) {
+    return null;
+  }
+  const result = await AdditionalTask.find(query);
+  return result;
+};
+const GetTotalGroceries = async (query) => {
+  if (!query?.employee) {
+    return null;
+  }
+  const result = await UserGroceryList.find(query);
+  return result;
+};
 const employeeServices = {
   getAllEmployees,
   getSingleEmployee,
   updateEmployee,
   deleteEmployee,
+  GetTotalAdditionalTask,
+  GetTotalGroceries,
 };
 export default employeeServices;

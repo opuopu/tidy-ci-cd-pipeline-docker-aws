@@ -3,6 +3,11 @@ import auth from "../middlewares/auth.js";
 import { USER_ROLE } from "../constant/user.role.js";
 import employeeControllers from "../controllers/employee.controller.js";
 const router = express.Router();
+router.get(
+  "/additional-task",
+  auth(USER_ROLE.EMPLOYEE),
+  employeeControllers.AdditionalTask
+);
 router.get("/", auth(USER_ROLE.HOMEOWNER), employeeControllers.getAllEmployees);
 router.get(
   "/:id",
@@ -18,6 +23,12 @@ router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
   employeeControllers.deleteAnEmployee
+);
+
+router.get(
+  "/grocries",
+  auth(USER_ROLE.EMPLOYEE),
+  employeeControllers.GetTotalGroceries
 );
 
 const employeeRoutes = router;
