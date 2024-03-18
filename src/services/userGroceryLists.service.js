@@ -203,6 +203,96 @@ const markAsComplete = async (id, payload) => {
     throw new Error(err);
   }
 };
+const sendBuyRequest = async (payload) => {
+  payload.status = "pending";
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const result = await UserGroceryList.create(
+      [
+        {
+          ...payload,
+          buyRequest: "pending",
+        },
+      ],
+      { session }
+    );
+    emitMessage(payload.homeOwner, TaskNotifcationMessage.buyRequest);
+    await notificationServices.insertNotificationIntoDB({
+      receiver: payload.homeOwner,
+      message: TaskNotifcationMessage.buyRequest,
+      refference: result[0]?._id,
+      type: "additional",
+    });
+    await session.commitTransaction();
+    await session.endSession();
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+const AcceptBuyRequest = async (id) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const result = await UserGroceryList.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          buyRequest: "accepted",
+        },
+      },
+      { new: true, session }
+    );
+
+    emitMessage(payload.employee, TaskNotifcationMessage.acceptBuyRequest);
+    await notificationServices.insertNotificationIntoDB({
+      receiver: payload.employee,
+      message: TaskNotifcationMessage.acceptBuyRequest,
+      refference: result[0]?._id,
+      type: "additional",
+    });
+    await session.commitTransaction();
+    await session.endSession();
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+const declineBuyRequest = async (id) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const result = await UserGroceryList.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          buyRequest: "declined",
+        },
+      },
+      { new: true, session }
+    );
+
+    emitMessage(payload.employee, TaskNotifcationMessage.declined);
+    await notificationServices.insertNotificationIntoDB({
+      receiver: payload.employee,
+      message: TaskNotifcationMessage.declined,
+      refference: result[0]?._id,
+      type: "additional",
+    });
+    await session.commitTransaction();
+    await session.endSession();
+    return result;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
 const userGroceryListServices = {
   insertUserGroceryListsIntoDB,
   findGroceryFromGroceryLists,
@@ -212,5 +302,8 @@ const userGroceryListServices = {
   deleteGroceryFromList,
   markAsBusy,
   markAsComplete,
+  sendBuyRequest,
+  AcceptBuyRequest,
+  declineBuyRequest,
 };
 export default userGroceryListServices;

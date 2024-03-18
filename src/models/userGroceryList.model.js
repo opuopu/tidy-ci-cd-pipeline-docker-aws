@@ -28,6 +28,10 @@ const userGrocerySchema = new Schema(
       enum: ["pending", "busy", "completed"],
       default: "pending",
     },
+    buyRequest: {
+      type: String,
+      enum: ["pending", "accepted", "declined"],
+    },
     instruction: {
       type: String,
     },

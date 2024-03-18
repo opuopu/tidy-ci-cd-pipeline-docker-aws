@@ -45,5 +45,20 @@ router.patch(
   auth(USER_ROLE.EMPLOYEE),
   userGroceryListControllers.markAsComplete
 );
+router.post(
+  "/buy-request",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.sendBuyRequest
+);
+router.patch(
+  "/accept-request/:id",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.acceptBuyRequest
+);
+router.patch(
+  "/decline-request/:id",
+  auth(USER_ROLE.EMPLOYEE),
+  userGroceryListControllers.DeclineRequest
+);
 const userGroceryListsRoutes = router;
 export default userGroceryListsRoutes;

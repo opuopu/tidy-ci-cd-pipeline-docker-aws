@@ -115,14 +115,44 @@ const markAsComplete = catchAsync(async (req, res) => {
   if (homeOwnerId) {
     req.body.homeOwner = homeOwnerId;
   }
-  const result = await userGroceryListServices.markAsComplete(
+  const result = await userGroceryListServices.sendBuyRequest(
     req.params.id,
     req.body
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "grocery list marked as complete successfully",
+    message: "buy request sent successfully",
+    data: result,
+  });
+});
+const sendBuyRequest = catchAsync(async (req, res) => {
+  const { homeOwnerId, userId } = req?.user || {};
+  req.body.homeOwner = homeOwnerId;
+  req.body.employee = userId;
+  const result = await userGroceryListServices.sendBuyRequest(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "request sent successfully",
+    data: result,
+  });
+});
+const acceptBuyRequest = catchAsync(async (req, res) => {
+  const result = await userGroceryListServices.AcceptBuyRequest(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "request approved successfully",
+    data: result,
+  });
+});
+const DeclineRequest = catchAsync(async (req, res) => {
+  const result = await userGroceryListServices.declineBuyRequest(req.params.id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "request declined successfully",
     data: result,
   });
 });
@@ -135,5 +165,8 @@ const userGroceryListControllers = {
   deleteGroceryFromList,
   markAsBusy,
   markAsComplete,
+  sendBuyRequest,
+  acceptBuyRequest,
+  DeclineRequest,
 };
 export default userGroceryListControllers;

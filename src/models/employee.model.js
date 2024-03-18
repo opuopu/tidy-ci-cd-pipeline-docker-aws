@@ -40,9 +40,11 @@ const employeeSchema = new Schema(
       },
     },
 
-    // access:{
-
-    // }
+    access: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     timestamps: true,
