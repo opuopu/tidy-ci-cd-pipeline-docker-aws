@@ -4,7 +4,21 @@ import {
   defaultTimeRanges,
 } from "../constant/workingDays.js";
 import AssignSchedule from "../models/AssignWorkSchedule.model.js";
+import AppError from "../errors/AppError.js";
+import httpStatus from "http-status";
 const insertScheduleIntoDb = async (payload) => {
+  const findSchedule = await AssignSchedule.findOne({
+    employee: payload?.employee,
+    workingDays: {
+      $in: payload?.workingDays,
+    },
+  });
+  if (findSchedule) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "day conflict. employee has already assigned during this days"
+    );
+  }
   const result = await AssignSchedule.create(payload);
   return result;
 };
@@ -52,18 +66,9 @@ const getDataFromSundayToThursday = async (userId) => {
       },
     },
     {
-      $group: {
-        _id: {
-          employeeId: "$employee._id",
-          name: "$employee.name",
-        },
-        schedules: { $push: { $arrayElemAt: ["$schedules", 0] } },
-      },
-    },
-    {
       $project: {
-        _id: "$_id.employeeId",
-        name: "$_id.name",
+        _id: "$_id",
+        employee: "$employee",
         schedules: "$schedules",
       },
     },
@@ -102,19 +107,9 @@ const getSaturdayData = async (userId) => {
       },
     },
     {
-      $group: {
-        _id: {
-          employeeId: "$employee._id",
-          name: "$employee.name",
-        },
-        schedules: { $push: { $arrayElemAt: ["$schedules", 0] } },
-      },
-    },
-    {
       $project: {
-        _id: "$_id.employeeId",
-        name: "$_id.name",
-        workingDays: "$workingDays",
+        _id: "$_id",
+        employee: "$employee",
         schedules: "$schedules",
       },
     },
@@ -133,6 +128,39 @@ const getWeekendData = async (userId) => {
   return result;
 };
 
+const employeeWorkDetailsByScheduleId = async (id) => {
+  console.log(id);
+  const ScheduleId = new Types.ObjectId(id);
+  const result = await AssignSchedule.aggregate([
+    {
+      $match: {
+        _id: ScheduleId,
+      },
+    },
+    {
+      $lookup: {
+        from: "employees",
+        localField: "employee",
+        foreignField: "_id",
+        as: "employee",
+      },
+    },
+    {
+      $unwind: "$employee",
+    },
+    {
+      $lookup: {
+        from: "workschedules",
+        localField: "_id",
+        foreignField: "schedule",
+        as: "schedules",
+      },
+    },
+  ]);
+  console.log(result);
+  return result;
+};
+
 const AssignScheduleServices = {
   insertScheduleIntoDb,
   getAllAssignSchedule,
@@ -141,5 +169,6 @@ const AssignScheduleServices = {
   getDataFromSundayToThursday,
   getWeekendData,
   getSaturdayData,
+  employeeWorkDetailsByScheduleId,
 };
 export default AssignScheduleServices;

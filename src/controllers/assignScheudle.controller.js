@@ -77,6 +77,17 @@ const getWeekendData = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const employeeWorkDetailsByScheduleId = catchAsync(async (req, res) => {
+  const result = await AssignScheduleServices.employeeWorkDetailsByScheduleId(
+    req?.params.scheduleId
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "employee details retrived successfully",
+    data: result,
+  });
+});
 const AssignScheduleControllers = {
   insertScheduleIntoDb,
   getAssignedScheduleById,
@@ -85,5 +96,6 @@ const AssignScheduleControllers = {
   getDataFromSundayToThursday,
   getWeekendData,
   getSaturdayData,
+  employeeWorkDetailsByScheduleId,
 };
 export default AssignScheduleControllers;
