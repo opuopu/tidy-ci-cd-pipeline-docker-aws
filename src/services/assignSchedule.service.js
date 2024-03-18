@@ -1,8 +1,5 @@
 import { Types } from "mongoose";
-import {
-  SundayToThursday,
-  defaultTimeRanges,
-} from "../constant/workingDays.js";
+import { SundayToThursday } from "../constant/workingDays.js";
 import AssignSchedule from "../models/AssignWorkSchedule.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
@@ -31,6 +28,19 @@ const getAssignedSchedule = async (id) => {
   return result;
 };
 const updateAssignSchedule = async (id, payload) => {
+  const findSchedule = await AssignSchedule.find({
+    _id: { $ne: id },
+    employee: payload?.employee,
+    workingDays: {
+      $in: payload?.workingDays,
+    },
+  });
+  if (findSchedule?.length > 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "day conflict. employee has already assigned during this days"
+    );
+  }
   const result = await AssignSchedule.findByIdAndUpdate(id, payload);
   return result;
 };
