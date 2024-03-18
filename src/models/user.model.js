@@ -48,14 +48,14 @@ const userSchema = new Schema(
     },
     trialExpirationDate: {
       type: Date,
-      required: [true, "trial expiration date is required"],
+      // required: [true, "trial expiration date is required"],
     },
   },
   {
     timestamps: true,
-    // toJSON: {
-    //   virtuals: true,
-    // },
+    toJSON: {
+      virtuals: true,
+    },
   }
 );
 userSchema.virtual("trialStatus").get(function () {
