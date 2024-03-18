@@ -47,11 +47,33 @@ const deleteAnEmployee = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const AdditionalTask = catchAsync(async (req, res) => {
+  req.query.employee = req.user.userId;
+  const result = await employeeServices.GetTotalAdditionalTask(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "data retrived successfully",
+    data: result,
+  });
+});
+const GetTotalGroceries = catchAsync(async (req, res) => {
+  req.query.employee = req.user.userId;
+  const result = await employeeServices.GetTotalGroceries(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "data retrived successfully",
+    data: result,
+  });
+});
 
 const employeeControllers = {
   getAllEmployees,
   getSingleEmployee,
   updateAnEmployee,
   deleteAnEmployee,
+  AdditionalTask,
+  GetTotalGroceries,
 };
 export default employeeControllers;

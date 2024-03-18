@@ -30,6 +30,11 @@ router.get(
   AssignScheduleControllers.getAllSchedules
 );
 router.get(
+  "/details/:scheduleId",
+  auth(USER_ROLE.HOMEOWNER),
+  AssignScheduleControllers.employeeWorkDetailsByScheduleId
+);
+router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   AssignScheduleControllers.getAssignedScheduleById
