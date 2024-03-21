@@ -15,6 +15,11 @@ router.get(
   recipeControllers.getAllRecipesByQuery
 );
 router.get(
+  "/all",
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
+  recipeControllers.getAllUsersRecipesByQuery
+);
+router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   recipeControllers.getSingleRecipe

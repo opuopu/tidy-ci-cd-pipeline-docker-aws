@@ -30,6 +30,16 @@ const getAllRecipesByQuery = catchAsync(async (req, res) => {
     meta: result?.meta,
   });
 });
+const getAllUsersRecipesByQuery = catchAsync(async (req, res) => {
+  const result = await recipeServices.getAllUsersRecipesByQuery(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "recipes retrived successfully",
+    data: result?.result,
+    meta: result?.meta,
+  });
+});
 const getSingleRecipe = catchAsync(async (req, res) => {
   const { userId } = req.user;
   const result = await recipeServices.getSingleRecipe(req.params.id, userId);
@@ -106,6 +116,7 @@ const removeFromFavouriteList = catchAsync(async (req, res) => {
 const recipeControllers = {
   insertRecipeIntoDB,
   getAllRecipesByQuery,
+  getAllUsersRecipesByQuery,
   getSingleRecipe,
   updateRecipe,
   deleteRecipe,

@@ -2,6 +2,7 @@ import Recipe from "../models/recipe.model.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import FavouriteRecipe from "../models/favouriteRecipe.model.js";
 const insertRecipeIntoDB = async (payload) => {
+  console.log(payload);
   const result = await Recipe.create(payload);
   return result;
 };
@@ -19,6 +20,20 @@ const getAllRecipesByQuery = async (query) => {
     result,
   };
 };
+const getAllUsersRecipesByQuery = async (query) => {
+  const recipeQuery = new QueryBuilder(Recipe.find(), query)
+    .search(["name"])
+    .filter()
+    .paginate()
+    .sort();
+  const result = await recipeQuery.modelQuery;
+  const meta = await recipeQuery.meta();
+  return {
+    meta,
+    result,
+  };
+};
+
 const getSingleRecipe = async (id, userId) => {
   const result = await Recipe.findOne({
     $and: [{ _id: id }, { user: userId }],
@@ -75,6 +90,7 @@ const deleteFromFavoriteRecipes = async (userId, recipeId) => {
 const recipeServices = {
   insertRecipeIntoDB,
   getAllRecipesByQuery,
+  getAllUsersRecipesByQuery,
   getSingleRecipe,
   updateRecipe,
   deleteRecipe,
