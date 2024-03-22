@@ -30,12 +30,7 @@ const recipeSchema = new Schema(
         required: [true, "steps is required"],
       },
     ],
-    tags: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Tags",
-      },
-    ],
+    tags: [{ type: String, required: [true, "tags is required"] }],
     favouriteList: {
       type: Boolean,
       default: false,
