@@ -21,16 +21,16 @@ const recipeSchema = new Schema(
     ingredients: [
       {
         type: String,
-        required: [true, "ingredient is required"],
+        // required: [true, "ingredient is required"],
       },
     ],
     steps: [
       {
         type: String,
-        required: [true, "steps is required"],
+        // required: [true, "steps is required"],
       },
     ],
-    tags: [{ type: String, required: [true, "tags is required"] }],
+    tags: [{ type: String }],
     favouriteList: {
       type: Boolean,
       default: false,

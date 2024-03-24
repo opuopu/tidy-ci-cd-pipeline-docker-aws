@@ -6,9 +6,7 @@ import mongoose from "mongoose";
 import { createToken, verifyToken } from "../utils/auth.utils.js";
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
-
 import bcrypt from "bcrypt";
-
 import Employee from "../models/employee.model.js";
 import { generateNewEmployeeId } from "../utils/employee.utils.js";
 // create homeOwner
@@ -134,6 +132,10 @@ const SigninHomeOwner = async (payload) => {
 // signi
 const SigninEmployee = async (payload) => {
   const { email, password } = payload;
+  console.log(email);
+  if (!email) {
+    throw new AppError(httpStatus.BAD_REQUEST, "please provide an email");
+  }
   const user = await User.isUserExist(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");

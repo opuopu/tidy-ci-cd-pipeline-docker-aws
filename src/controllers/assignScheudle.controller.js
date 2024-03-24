@@ -79,12 +79,24 @@ const getWeekendData = catchAsync(async (req, res) => {
 });
 const employeeWorkDetailsByScheduleId = catchAsync(async (req, res) => {
   const result = await AssignScheduleServices.employeeWorkDetailsByScheduleId(
-    req?.params.scheduleId
+    req.params.scheduleId
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "employee details retrived successfully",
+    message: "employee schedule data retrived successfully",
+    data: result,
+  });
+});
+const getScheduleDataByEmployee = catchAsync(async (req, res) => {
+  console.log(req.user, "hitted");
+  const result = await AssignScheduleServices.getScheduleDataByEmployee(
+    req?.user?.userId
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "employee schedule data retrived successfully",
     data: result,
   });
 });
@@ -97,5 +109,6 @@ const AssignScheduleControllers = {
   getWeekendData,
   getSaturdayData,
   employeeWorkDetailsByScheduleId,
+  getScheduleDataByEmployee,
 };
 export default AssignScheduleControllers;

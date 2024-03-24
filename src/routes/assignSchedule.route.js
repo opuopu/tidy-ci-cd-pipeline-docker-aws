@@ -31,8 +31,13 @@ router.get(
 );
 router.get(
   "/details/:scheduleId",
-  auth(USER_ROLE.HOMEOWNER),
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   AssignScheduleControllers.employeeWorkDetailsByScheduleId
+);
+router.get(
+  "/employee",
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
+  AssignScheduleControllers.getScheduleDataByEmployee
 );
 router.get(
   "/:id",

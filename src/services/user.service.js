@@ -24,6 +24,8 @@ const getme = async (userId, role) => {
     role: result?.user?.role,
     refferalCode: result?.refferalCode,
     homes: result?.homes,
+    address: result?.address,
+    reminder: result?.reminder,
     trial: result?.user?.trial,
     trialExpirationDate: result?.user?.trialExpirationDate,
     trialStatus: dateCompare(date, result?.user?.trialExpirationDate),

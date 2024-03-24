@@ -20,7 +20,6 @@ const insertAdditionalTaskIntoDb = async (payload) => {
     status = "ongoing";
     nextOccurrence = nextMonth(workingDate);
   }
-  console.log(nextOccurrence);
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -55,7 +54,6 @@ const insertAdditionalTaskIntoDb = async (payload) => {
   }
 };
 const getAllAdditionlTask = async (query) => {
-  console.log(query);
   const additionalTaskModel = new QueryBuilder(AdditionalTask.find(), query)
     .search(["name"])
     .filter()

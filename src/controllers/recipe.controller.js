@@ -5,6 +5,7 @@ import sendResponse from "../utils/sendResponse.js";
 
 const insertRecipeIntoDB = catchAsync(async (req, res) => {
   const { userId } = req.user;
+  console.log("body", req.body);
   const data = {
     ...req.body,
     user: userId,

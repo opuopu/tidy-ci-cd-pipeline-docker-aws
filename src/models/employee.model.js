@@ -11,6 +11,13 @@ const employeeSchema = new Schema(
       ref: "HomeOwner",
       required: [true, "homeOwner inforamtion is required"],
     },
+    reminder: {
+      type: Boolean,
+      default: false,
+    },
+    address: {
+      type: String,
+    },
     user: {
       type: Types.ObjectId,
       ref: "User",

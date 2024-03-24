@@ -139,7 +139,6 @@ const getWeekendData = async (userId) => {
 };
 
 const employeeWorkDetailsByScheduleId = async (id) => {
-  console.log(id);
   const ScheduleId = new Types.ObjectId(id);
   const result = await AssignSchedule.aggregate([
     {
@@ -170,6 +169,37 @@ const employeeWorkDetailsByScheduleId = async (id) => {
   console.log(result);
   return result;
 };
+const getScheduleDataByEmployee = async (id) => {
+  const employeeId = new Types.ObjectId(id);
+  console.log(employeeId);
+  const result = await AssignSchedule.aggregate([
+    {
+      $match: {
+        employee: employeeId,
+      },
+    },
+    // {
+    //   $lookup: {
+    //     from: "employees",
+    //     localField: "employee",
+    //     foreignField: "_id",
+    //     as: "employee",
+    //   },
+    // },
+    // {
+    //   $unwind: "$employee",
+    // },
+    {
+      $lookup: {
+        from: "workschedules",
+        localField: "_id",
+        foreignField: "schedule",
+        as: "schedules",
+      },
+    },
+  ]);
+  return result;
+};
 
 const AssignScheduleServices = {
   insertScheduleIntoDb,
@@ -179,6 +209,7 @@ const AssignScheduleServices = {
   getDataFromSundayToThursday,
   getWeekendData,
   getSaturdayData,
+  getScheduleDataByEmployee,
   employeeWorkDetailsByScheduleId,
 };
 export default AssignScheduleServices;
