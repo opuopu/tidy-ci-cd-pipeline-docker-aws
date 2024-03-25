@@ -86,3 +86,7 @@ export const nextMonth = (date) => {
 export const nextYear = (date) => {
   return dayjs(date).add(1, "year").toDate();
 };
+
+export const findArrayIntersection = (workingdays, weekend) => {
+  return workingdays.filter((item) => weekend.includes(item));
+};

@@ -8,6 +8,11 @@ router.get(
   auth(USER_ROLE.EMPLOYEE),
   employeeControllers.AdditionalTask
 );
+router.get(
+  "/groceries",
+  auth(USER_ROLE.EMPLOYEE),
+  employeeControllers.GetTotalGroceries
+);
 router.get("/", auth(USER_ROLE.HOMEOWNER), employeeControllers.getAllEmployees);
 router.get(
   "/:id",
@@ -23,12 +28,6 @@ router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
   employeeControllers.deleteAnEmployee
-);
-
-router.get(
-  "/grocries",
-  auth(USER_ROLE.EMPLOYEE),
-  employeeControllers.GetTotalGroceries
 );
 
 const employeeRoutes = router;

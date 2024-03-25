@@ -11,7 +11,7 @@ const userGrocerySchema = new Schema(
       required: [true, "homwowner information is required"],
     },
     employee: {
-      type: String,
+      type: Types.ObjectId,
       ref: "Employee",
       required: [true, "employee information is required"],
     },
@@ -25,7 +25,7 @@ const userGrocerySchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "busy", "completed"],
+      enum: ["pending", "busy", "completed", "awaiting_approval"],
       default: "pending",
     },
     buyRequest: {

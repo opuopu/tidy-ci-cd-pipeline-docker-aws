@@ -58,6 +58,7 @@ const AdditionalTask = catchAsync(async (req, res) => {
   });
 });
 const GetTotalGroceries = catchAsync(async (req, res) => {
+  console.log(req.user);
   req.query.employee = req.user.userId;
   const result = await employeeServices.GetTotalGroceries(req.query);
   sendResponse(res, {

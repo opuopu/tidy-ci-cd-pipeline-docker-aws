@@ -46,6 +46,7 @@ const GetTotalAdditionalTask = async (query) => {
   return result;
 };
 const GetTotalGroceries = async (query) => {
+  console.log(query);
   if (!query?.employee) {
     return null;
   }

@@ -3,6 +3,7 @@ import { SundayToThursday } from "../constant/workingDays.js";
 import AssignSchedule from "../models/AssignWorkSchedule.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
+import { findArrayIntersection } from "../utils/schedule.utils.js";
 const insertScheduleIntoDb = async (payload) => {
   const findSchedule = await AssignSchedule.findOne({
     employee: payload?.employee,
@@ -10,6 +11,14 @@ const insertScheduleIntoDb = async (payload) => {
       $in: payload?.workingDays,
     },
   });
+  if (findArrayIntersection(payload?.workingDays, payload?.weekend)) {
+    if (findSchedule) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "you cannot assign the same date to both working days and weekends"
+      );
+    }
+  }
   if (findSchedule) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -178,17 +187,6 @@ const getScheduleDataByEmployee = async (id) => {
         employee: employeeId,
       },
     },
-    // {
-    //   $lookup: {
-    //     from: "employees",
-    //     localField: "employee",
-    //     foreignField: "_id",
-    //     as: "employee",
-    //   },
-    // },
-    // {
-    //   $unwind: "$employee",
-    // },
     {
       $lookup: {
         from: "workschedules",

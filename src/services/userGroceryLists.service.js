@@ -64,7 +64,9 @@ const getgroceryListByEmployee = async (query) => {
   };
 };
 const getuserSingleGroceryList = async (id) => {
-  const result = await UserGroceryList.findById(id).populate("homeOwner");
+  const result = await UserGroceryList.findById(id).populate(
+    "homeOwner employee"
+  );
 
   return result;
 };
@@ -160,6 +162,7 @@ const markAsBusy = async (id, payload) => {
 };
 const markAsComplete = async (id, payload) => {
   const session = await mongoose.startSession();
+  console.log(id, payload);
   try {
     session.startTransaction();
     const result = await UserGroceryList.findByIdAndUpdate(
@@ -204,7 +207,7 @@ const markAsComplete = async (id, payload) => {
   }
 };
 const sendBuyRequest = async (payload) => {
-  payload.status = "pending";
+  payload.status = "awaiting_approval";
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -218,12 +221,17 @@ const sendBuyRequest = async (payload) => {
       { session }
     );
     emitMessage(payload.homeOwner, TaskNotifcationMessage.buyRequest);
-    await notificationServices.insertNotificationIntoDB({
-      receiver: payload.homeOwner,
-      message: TaskNotifcationMessage.buyRequest,
-      refference: result[0]?._id,
-      type: "additional",
-    });
+    await notificationServices.insertNotificationIntoDB(
+      [
+        {
+          receiver: payload.homeOwner,
+          message: TaskNotifcationMessage.buyRequest,
+          refference: result[0]?._id,
+          type: "additional",
+        },
+      ],
+      session
+    );
     await session.commitTransaction();
     await session.endSession();
     return result;
@@ -241,6 +249,7 @@ const AcceptBuyRequest = async (id) => {
       id,
       {
         $set: {
+          status: "pending",
           buyRequest: "accepted",
         },
       },

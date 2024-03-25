@@ -115,18 +115,19 @@ const markAsComplete = catchAsync(async (req, res) => {
   if (homeOwnerId) {
     req.body.homeOwner = homeOwnerId;
   }
-  const result = await userGroceryListServices.sendBuyRequest(
+  const result = await userGroceryListServices.markAsComplete(
     req.params.id,
     req.body
   );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "buy request sent successfully",
+    message: "status changed successfully",
     data: result,
   });
 });
 const sendBuyRequest = catchAsync(async (req, res) => {
+  console.log("hitted");
   const { homeOwnerId, userId } = req?.user || {};
   req.body.homeOwner = homeOwnerId;
   req.body.employee = userId;
@@ -139,6 +140,7 @@ const sendBuyRequest = catchAsync(async (req, res) => {
   });
 });
 const acceptBuyRequest = catchAsync(async (req, res) => {
+  console.log("hitted");
   const result = await userGroceryListServices.AcceptBuyRequest(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
