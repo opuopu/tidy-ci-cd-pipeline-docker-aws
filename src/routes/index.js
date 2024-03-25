@@ -24,6 +24,7 @@ import packagteRoutes from "./package.route.js";
 import Subscription from "../models/subscription.model.js";
 import SubscriptionRoutes from "./subscription.route.js";
 import assignSchedulesRoutes from "./assignSchedule.route.js";
+import taskcompletationHistoryRoutes from "./taskcompletationHistory.route.js";
 const router = Router();
 const moduleRoutes = [
   {
@@ -82,6 +83,10 @@ const moduleRoutes = [
   {
     path: "/additional-task",
     route: additionalTaskRoutes,
+  },
+  {
+    path: "/history",
+    route: taskcompletationHistoryRoutes,
   },
   {
     path: "/user-grocery-lists",
