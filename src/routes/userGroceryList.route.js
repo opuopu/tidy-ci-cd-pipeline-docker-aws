@@ -6,7 +6,12 @@ const router = express.Router();
 
 router.post(
   "/",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.HOMEOWNER),
+  auth(USER_ROLE.HOMEOWNER),
+  userGroceryListControllers.insertUserGroceryListsIntoDB
+);
+router.post(
+  "/employee",
+  auth(USER_ROLE.EMPLOYEE),
   userGroceryListControllers.insertUserGroceryListsIntoDB
 );
 

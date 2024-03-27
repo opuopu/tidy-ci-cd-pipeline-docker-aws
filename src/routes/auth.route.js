@@ -8,7 +8,11 @@ import parseData from "../middlewares/parseData.js";
 import fileUpload from "../middlewares/fileUpload.js";
 const router = express.Router();
 const upload = fileUpload("./public/uploads/employee/");
-router.post("/homeOwner/signup", authControllers.signupHomeOwnerIntoDB);
+router.post(
+  "/homeOwner/signup",
+  validateRequest(authValidation.signupHomeOwnerSchema),
+  authControllers.signupHomeOwnerIntoDB
+);
 router.post(
   "/employee/signup",
   upload.single("file"),
