@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-
 const SubscriptionSchema = new Schema(
   {
     user: {
@@ -15,6 +14,7 @@ const SubscriptionSchema = new Schema(
     currency: {
       type: String,
       required: [true, "currency information is required"],
+      default: "usd",
     },
     startDate: {
       type: Date,
@@ -26,6 +26,7 @@ const SubscriptionSchema = new Schema(
     },
     transactionId: {
       type: String,
+      default: "",
     },
     status: {
       type: Boolean,

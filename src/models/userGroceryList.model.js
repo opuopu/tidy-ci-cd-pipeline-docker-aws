@@ -31,12 +31,15 @@ const userGrocerySchema = new Schema(
     buyRequest: {
       type: String,
       enum: ["pending", "accepted", "declined"],
+      default: "",
     },
     instruction: {
       type: String,
+      default: "",
     },
     note: {
       type: String,
+      default: "",
     },
   },
   {
