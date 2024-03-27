@@ -1,3 +1,4 @@
+import QueryBuilder from "../builder/QueryBuilder.js";
 import GroceryList from "../models/groceryList.model.js";
 
 const insertGroceryListIntoDB = async (payload) => {
@@ -5,12 +6,19 @@ const insertGroceryListIntoDB = async (payload) => {
   return result;
 };
 
-const getGroceryListsByCategory = async (payload) => {
-  const { category } = payload;
-  const query = {};
-  query["category"] = category;
-  const result = await GroceryList.find(query).populate("category");
-  return result;
+const getGroceryListsByCategory = async (query) => {
+  const GroceryListModel = new QueryBuilder(GroceryList.find(), query)
+    .search(["name"])
+    .filter()
+    .paginate()
+    .fields()
+    .sort();
+  const result = await GroceryListModel.modelQuery;
+  const meta = await GroceryListModel.meta();
+  return {
+    result,
+    meta,
+  };
 };
 
 const getSingleGroceryList = async (id) => {

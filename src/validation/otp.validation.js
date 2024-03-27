@@ -1,3 +1,4 @@
+import { z } from "zod";
 const SignupOtpVerificationSchema = z.object({
   body: z.object({
     name: z.string({
@@ -19,7 +20,16 @@ const SignupOtpVerificationSchema = z.object({
     })
     .min(6, { required_error: "password must be at least 6 characters" }),
 });
-
+const forgotPasswordVerifySchema = z.object({
+  body: z.object({
+    email: z.string().email({ required_error: "Invalid email format" }),
+    otp: z
+      .string({ required_error: "otp is required" })
+      .min(6, { required_error: "OTP must be at least 6 characters long" }),
+  }),
+});
 const otpValidation = {
   SignupOtpVerificationSchema,
+  forgotPasswordVerifySchema,
 };
+export default otpValidation;
