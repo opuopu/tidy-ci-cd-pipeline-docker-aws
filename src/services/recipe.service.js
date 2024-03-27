@@ -63,15 +63,14 @@ const addToFavoriteRecipes = async (userId, recipeId) => {
   const result = await FavouriteRecipe.findOneAndUpdate(
     { user: userId },
     { $addToSet: { lists: recipeId } },
-    { new: true },
-    { upsert: true }
-  );
+    { new: true, upsert: true }
+  ).populate("lists");
   return result;
 };
 
 const getFavouriteRecipes = async (query) => {
   const result = await FavouriteRecipe.findOne(query).populate("lists");
-  return result?.lists;
+  return result;
 };
 
 const deleteFromFavoriteRecipes = async (userId, recipeId) => {
