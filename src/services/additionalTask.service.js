@@ -8,7 +8,6 @@ import QueryBuilder from "../builder/QueryBuilder.js";
 import TaskCompletationHistory from "../models/taskCompleteHistory.model.js";
 import AppError from "../errors/AppError.js";
 import { dateCompare } from "../utils/date.utils.js";
-import sendResponse from "../utils/sendResponse.js";
 const insertAdditionalTaskIntoDb = async (payload) => {
   const { workingDate } = payload;
 
@@ -157,7 +156,7 @@ const markAsComplete = async (id, payload) => {
     payload.workingDate = findTask.nextOccurrence;
     payload.nextOccurrence = nextMonth(findTask?.nextOccurrence);
   } else if (findTask?.recurrence === "onetime") {
-    payload.status = "complete";
+    payload.status = "completed";
   }
   try {
     session.startTransaction();
