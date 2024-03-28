@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import AppError from "../errors/AppError.js";
 import UserGroceryList from "../models/userGroceryList.model.js";
-import { emitMessage } from "../utils/socket.utils.js";
+
 import mongoose from "mongoose";
 import notificationServices from "./notification.service.js";
 import { TaskNotifcationMessage } from "../constant/notificationMessae.js";
@@ -178,7 +178,7 @@ const markAsComplete = async (id, payload) => {
       }
     );
 
-    if (!result) {
+    if (!result[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "failed to update. please try again"
