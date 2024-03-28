@@ -7,7 +7,7 @@ import { createFileDetails } from "../utils/file.utils.js";
 
 const insertBudgetCategoryIntoDb = catchAsync(async (req, res) => {
   if (req?.file) {
-    req.body.icon = createFileDetails("budgetCategory", req?.file?.fileName);
+    req.body.icon = createFileDetails("icon", req?.file?.filename);
   }
 
   const result = await budgetCategoryServices.insertBudgetCategoryIntoDb(

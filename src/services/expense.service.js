@@ -10,7 +10,7 @@ const InsertExpenseIntoDb = async (payload) => {
   if (findBudget?.progress === 100) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "Budget progress full. Please update amount."
+      "Budget progress is full. Please update amount."
     );
   }
   if (payload?.amount > findBudget.remainingAmount) {
