@@ -34,12 +34,15 @@ class QueryBuilder {
   // notEqual
 
   notEqual(notEqualConditions) {
-    Object.entries(notEqualConditions).forEach(([fieldName, value]) => {
-      if (value !== undefined) {
-        const notEqualQuery = { [fieldName]: { $ne: value } };
-        this.modelQuery = this.modelQuery.find(notEqualQuery);
-      }
-    });
+    if (notEqualConditions && Object.keys(notEqualConditions).length > 0) {
+      const notEqualQuery = {};
+      Object.entries(notEqualConditions).forEach(([fieldName, value]) => {
+        if (value !== undefined) {
+          notEqualQuery[fieldName] = { $ne: value };
+        }
+      });
+      this.modelQuery = this.modelQuery.find(notEqualQuery);
+    }
     return this;
   }
 
