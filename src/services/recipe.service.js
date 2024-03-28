@@ -40,9 +40,7 @@ const getAllUsersRecipesByQuery = async (query) => {
 };
 
 const getSingleRecipe = async (id, userId) => {
-  const result = await Recipe.findOne({
-    $and: [{ _id: id }, { user: userId }],
-  }).populate("user");
+  const result = await Recipe.findById(id).populate("user");
   return result;
 };
 

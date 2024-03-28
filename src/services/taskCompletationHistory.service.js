@@ -2,7 +2,10 @@ import QueryBuilder from "../builder/QueryBuilder.js";
 import TaskCompletationHistory from "../models/taskCompleteHistory.model.js";
 
 const getAllHistoryByTaskId = async (query) => {
-  const historyModel = new QueryBuilder(TaskCompletationHistory.find(), query)
+  const historyModel = new QueryBuilder(
+    TaskCompletationHistory.find().populate("task"),
+    query
+  )
     .search()
     .filter()
     .paginate()
