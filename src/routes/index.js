@@ -85,7 +85,7 @@ const moduleRoutes = [
     route: additionalTaskRoutes,
   },
   {
-    path: "/history",
+    path: "/histories",
     route: taskcompletationHistoryRoutes,
   },
   {
