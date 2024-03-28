@@ -3,7 +3,7 @@ import { hasTimeConflict } from "../utils/schedule.utils.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import AssignSchedule from "../models/AssignWorkSchedule.model.js";
-import { emitMessage } from "../utils/socket.utils.js";
+
 import { TaskNotifcationMessage } from "../constant/notificationMessae.js";
 import notificationServices from "./notification.service.js";
 
@@ -82,7 +82,7 @@ const finishSchedule = async (payload) => {
   if (!findSchedule) {
     throw new AppError(httpStatus.NOT_FOUND, "schedule information not found");
   }
-  emitMessage(findSchedule?.employee, TaskNotifcationMessage.daily);
+
   const result = await notificationServices.insertNotificationIntoDBv2({
     receiver: findSchedule?.employee,
     refference: schedule,

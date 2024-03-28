@@ -2,7 +2,6 @@ import httpStatus from "http-status";
 import { TaskNotifcationMessage } from "../constant/notificationMessae.js";
 import AdditionalTask from "../models/additionalTask.model.js";
 import mongoose from "mongoose";
-import { emitMessage, SocketResponse } from "../utils/socket.utils.js";
 import { nextMonth, nextWeekDay } from "../utils/schedule.utils.js";
 import notificationServices from "./notification.service.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
@@ -124,7 +123,7 @@ const markAsBusy = async (id, payload) => {
         "failed to update. please try again"
       );
     }
-    emitMessage(result?.homeOwner, TaskNotifcationMessage.busy);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -166,7 +165,7 @@ const markAsComplete = async (id, payload) => {
       new: true,
       session,
     });
-
+    console.log("result", result);
     if (!result) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -191,7 +190,7 @@ const markAsComplete = async (id, payload) => {
         );
       }
     }
-    emitMessage(result?.homeOwner, TaskNotifcationMessage.completed);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -235,7 +234,7 @@ const AprooveReschedule = async (id) => {
         "failed to approve. Please try again"
       );
     }
-    emitMessage(result?.homeOwner, TaskNotifcationMessage.approved);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -266,7 +265,7 @@ const AssignToothers = async (payload) => {
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }
-    emitMessage(payload?.employee, TaskNotifcationMessage.additional);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -307,7 +306,7 @@ const UpdateAdditionalTask = async (id, payload) => {
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }
-    emitMessage(payload?.employee, TaskNotifcationMessage.additional);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {

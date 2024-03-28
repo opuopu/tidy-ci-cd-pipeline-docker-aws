@@ -178,7 +178,7 @@ const markAsComplete = async (id, payload) => {
       }
     );
 
-    if (!result[0]) {
+    if (!result) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "failed to update. please try again"
