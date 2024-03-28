@@ -26,8 +26,7 @@ const getallFromDb = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "budgets  retrived successfully",
-    data: result?.result,
-    meta: result?.meta,
+    data: result,
   });
 });
 const getSingleFromDb = catchAsync(async (req, res) => {

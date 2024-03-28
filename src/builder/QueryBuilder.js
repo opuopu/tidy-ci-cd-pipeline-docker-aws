@@ -31,6 +31,18 @@ class QueryBuilder {
     return this;
   }
 
+  // notEqual
+
+  notEqual(notEqualConditions) {
+    Object.entries(notEqualConditions).forEach(([fieldName, value]) => {
+      if (value !== undefined) {
+        const notEqualQuery = { [fieldName]: { $ne: value } };
+        this.modelQuery = this.modelQuery.find(notEqualQuery);
+      }
+    });
+    return this;
+  }
+
   //   sorting
   sort() {
     const sort = this?.query?.sort?.split(",")?.join(" ") || "-createdAt";

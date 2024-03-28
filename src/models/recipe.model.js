@@ -18,6 +18,12 @@ const recipeSchema = new Schema(
       type: String,
       required: [true, "description is required"],
     },
+
+    status: {
+      type: Boolean,
+      default: true,
+    },
+
     ingredients: [
       {
         type: String,
@@ -31,10 +37,6 @@ const recipeSchema = new Schema(
       },
     ],
     tags: [{ type: String }],
-    favouriteList: {
-      type: Boolean,
-      default: false,
-    },
   },
 
   {

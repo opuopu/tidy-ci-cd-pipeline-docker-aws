@@ -22,6 +22,7 @@ const insertRecipeIntoDB = catchAsync(async (req, res) => {
 const getAllRecipesByQuery = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.query.user = userId;
+  req.query.status = true;
   const result = await recipeServices.getAllRecipesByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -32,6 +33,8 @@ const getAllRecipesByQuery = catchAsync(async (req, res) => {
   });
 });
 const getAllUsersRecipesByQuery = catchAsync(async (req, res) => {
+  req.query.user = req.user.userId;
+  req.query.status = true;
   const result = await recipeServices.getAllUsersRecipesByQuery(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
