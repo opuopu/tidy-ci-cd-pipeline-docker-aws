@@ -15,7 +15,7 @@ const insertUserGroceryListsIntoDB = async (payload) => {
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }
-    emitMessage(payload?.employee, TaskNotifcationMessage.grocery);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -87,7 +87,6 @@ const updateUserGroceryList = async (id, payload) => {
       payload?.employee &&
       payload?.employee !== findUserGroceryLists?.employee
     ) {
-      emitMessage(payload?.employee, TaskNotifcationMessage.grocery);
       await notificationServices.insertNotificationIntoDB(
         [
           {
@@ -139,7 +138,7 @@ const markAsBusy = async (id, payload) => {
         "failed to update. please try again"
       );
     }
-    emitMessage(payload?.homeOwner, TaskNotifcationMessage.busy);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -185,7 +184,7 @@ const markAsComplete = async (id, payload) => {
         "failed to update. please try again"
       );
     }
-    emitMessage(payload?.homeOwner, TaskNotifcationMessage.completed);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -220,7 +219,7 @@ const sendBuyRequest = async (payload) => {
       ],
       { session }
     );
-    emitMessage(payload.homeOwner, TaskNotifcationMessage.buyRequest);
+
     await notificationServices.insertNotificationIntoDB(
       [
         {
@@ -256,7 +255,6 @@ const AcceptBuyRequest = async (id) => {
       { new: true, session }
     );
 
-    emitMessage(payload.employee, TaskNotifcationMessage.acceptBuyRequest);
     await notificationServices.insertNotificationIntoDB({
       receiver: payload.employee,
       message: TaskNotifcationMessage.acceptBuyRequest,
@@ -286,7 +284,6 @@ const declineBuyRequest = async (id) => {
       { new: true, session }
     );
 
-    emitMessage(payload.employee, TaskNotifcationMessage.declined);
     await notificationServices.insertNotificationIntoDB({
       receiver: payload.employee,
       message: TaskNotifcationMessage.declined,

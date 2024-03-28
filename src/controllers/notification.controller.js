@@ -5,7 +5,7 @@ import sendResponse from "../utils/sendResponse.js";
 
 const getUserSpecificNotifications = catchAsync(async (req, res) => {
   const { userId } = req.user;
-  req.query.receiver = userId;
+  req.query.receiver = "66010b65f76bcbc6f312771f";
   const result = await notificationServices.getUserSpecificNotifications(
     req.query
   );

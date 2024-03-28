@@ -1,7 +1,9 @@
 import QueryBuilder from "../builder/QueryBuilder.js";
 import Notification from "../models/notification.model.js";
+import { emitMessage } from "../utils/socket.utils.js";
 const insertNotificationIntoDB = async (payload, session) => {
   const result = await Notification.create(payload, { session });
+  emitMessage(result[0]?.receiver, result[0]);
   return result;
 };
 const insertNotificationIntoDBv2 = async (payload) => {
@@ -9,7 +11,7 @@ const insertNotificationIntoDBv2 = async (payload) => {
   return result;
 };
 const getUserSpecificNotifications = async (query) => {
-  const notificationQuery = new QueryBuilder(Notification.find({}), query)
+  const notificationQuery = new QueryBuilder(Notification.find(), query)
     .search()
     .filter()
     .sort()

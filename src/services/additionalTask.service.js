@@ -2,15 +2,17 @@ import httpStatus from "http-status";
 import { TaskNotifcationMessage } from "../constant/notificationMessae.js";
 import AdditionalTask from "../models/additionalTask.model.js";
 import mongoose from "mongoose";
-import { emitMessage } from "../utils/socket.utils.js";
+import { emitMessage, SocketResponse } from "../utils/socket.utils.js";
 import { nextMonth, nextWeekDay } from "../utils/schedule.utils.js";
 import notificationServices from "./notification.service.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
 import TaskCompletationHistory from "../models/taskCompleteHistory.model.js";
 import AppError from "../errors/AppError.js";
 import { dateCompare } from "../utils/date.utils.js";
+import sendResponse from "../utils/sendResponse.js";
 const insertAdditionalTaskIntoDb = async (payload) => {
   const { workingDate } = payload;
+
   let status;
   let nextOccurrence;
   if (payload.recurrence === "weekly") {
@@ -31,19 +33,14 @@ const insertAdditionalTaskIntoDb = async (payload) => {
     if (!result) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to assign task");
     }
-    emitMessage(payload?.employee, TaskNotifcationMessage.additional);
-    await notificationServices.insertNotificationIntoDB(
-      [
-        {
-          receiver: payload.employee,
-          refference: result?._id,
-          message: TaskNotifcationMessage.additional,
-          type: "additional",
-        },
-      ],
-      session
-    );
 
+    const messageObj = {
+      receiver: payload.employee,
+      refference: result?._id,
+      message: TaskNotifcationMessage.additional,
+      type: "additional",
+    };
+    await notificationServices.insertNotificationIntoDB([messageObj], session);
     await session.commitTransaction();
     await session.endSession();
     return result;
