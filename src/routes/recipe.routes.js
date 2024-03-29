@@ -10,8 +10,8 @@ router.post(
   recipeControllers.insertRecipeIntoDB
 );
 router.get(
+  auth(USER_ROLE.HOMEOWNER),
   "/",
-  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   recipeControllers.getAllRecipesByQuery
 );
 router.get(
