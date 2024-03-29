@@ -9,6 +9,7 @@ router.post(
   auth(USER_ROLE.HOMEOWNER),
   recipeControllers.insertRecipeIntoDB
 );
+
 router.get(
   "/",
   auth(USER_ROLE.HOMEOWNER),

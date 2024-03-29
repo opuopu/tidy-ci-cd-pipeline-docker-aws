@@ -9,6 +9,7 @@ import Otp from "../models/Otp.model.js";
 import bcrypt from "bcrypt";
 import Employee from "../models/employee.model.js";
 import { generateNewEmployeeId } from "../utils/employee.utils.js";
+import HomeOwner from "../models/homeOwner.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -96,6 +97,8 @@ const SigninHomeOwner = async (payload) => {
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.BAD_REQUEST, "password do not match!");
   }
+
+  const findHomeOwner = await HomeOwner.findOne({ user: user?._id });
   // if (!verified) {
   //   throw new AppError(
   //     httpStatus.BAD_REQUEST,
@@ -124,7 +127,7 @@ const SigninHomeOwner = async (payload) => {
   );
 
   return {
-    user: user,
+    user: { ...others, homes: findHomeOwner?.homes },
     accessToken,
     refreshToken,
   };

@@ -8,12 +8,13 @@ router.get(
   auth(USER_ROLE.EMPLOYEE),
   employeeControllers.AdditionalTask
 );
+router.get("/", auth(USER_ROLE.HOMEOWNER), employeeControllers.getAllEmployees);
 router.get(
   "/groceries",
   auth(USER_ROLE.EMPLOYEE),
   employeeControllers.GetTotalGroceries
 );
-router.get("/", auth(USER_ROLE.HOMEOWNER), employeeControllers.getAllEmployees);
+
 router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),

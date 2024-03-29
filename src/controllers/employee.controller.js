@@ -8,12 +8,12 @@ import { createFileDetails } from "../utils/file.utils.js";
 const getAllEmployees = catchAsync(async (req, res) => {
   const { userId } = req.user;
   req.query.homeOwner = userId;
-  const result = await employeeServices.getallFromDb(req.query);
+  const result = await employeeServices.getAllEmployees(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Employees Retrieved  successfully",
-    data: result?.data,
+    data: result?.result,
     meta: result?.meta,
   });
 });

@@ -20,7 +20,8 @@ const getAllHomes = catchAsync(async (req, res, next) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "homes are retrieved successfully.",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 
