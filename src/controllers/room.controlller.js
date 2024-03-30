@@ -14,6 +14,18 @@ const inserRoomIntoDB = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const insertSingleRoomIntoDb = catchAsync(async (req, res) => {
+  const { userId } = req?.user;
+  console.log(req.body);
+  req.body.user = userId;
+  const result = await roomServices.insertSingleRoomIntoDb(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "room is created successfully",
+    data: result,
+  });
+});
 const getRoomsByQuery = catchAsync(async (req, res) => {
   const result = await roomServices.getRoomsByQuery(req.query);
   sendResponse(res, {
@@ -54,6 +66,7 @@ const deleteRoom = catchAsync(async (req, res) => {
 
 const roomControllers = {
   inserRoomIntoDB,
+  insertSingleRoomIntoDb,
   getRoomsByQuery,
   getSingleRoom,
   updateRoom,

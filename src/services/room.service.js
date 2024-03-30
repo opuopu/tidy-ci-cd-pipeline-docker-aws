@@ -59,6 +59,10 @@ const inserRoomIntoDB = async (payload) => {
     throw new Error(err);
   }
 };
+const insertSingleRoomIntoDb = async (payload) => {
+  const result = await Room.create(payload);
+  return result;
+};
 const getRoomsByQuery = async (query) => {
   const roomQuery = new QueryBuilder(Room.find(), query)
     .search()
@@ -88,6 +92,7 @@ const deleteRoom = async (id) => {
 
 const roomServices = {
   inserRoomIntoDB,
+  insertSingleRoomIntoDb,
   getRoomsByQuery,
   getSingleRoom,
   updateRoom,
