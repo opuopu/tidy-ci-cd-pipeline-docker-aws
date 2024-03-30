@@ -5,6 +5,7 @@ import httpStatus from "http-status";
 import mongoose from "mongoose";
 import Expense from "../models/expense.model.js";
 const insertBudgetIntoDB = async (payload) => {
+  console.log(payload);
   const { month } = payload;
   const [year, mon] = month.split("-");
   const formatedDate = `${year}-${mon}-01T00:00:00.000Z`;
@@ -20,6 +21,7 @@ const insertBudgetIntoDB = async (payload) => {
   }
 
   payload.month = new Date(formatedDate);
+  console.log(payload);
   const result = await Budget.create(payload);
   return result;
 };
