@@ -15,7 +15,7 @@ router.get(
   auth(USER_ROLE.HOMEOWNER),
   recipeControllers.getMyFavouriteRecipe
 );
-router.patch(
+router.delete(
   "/:id",
   auth(USER_ROLE.HOMEOWNER),
   recipeControllers.removeFromFavouriteList
