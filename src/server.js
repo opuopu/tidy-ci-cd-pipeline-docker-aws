@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import app from "./app.js";
 import { createServer } from "http";
 import infoLogger from "./Logger/infoLogger.js";
 import errorLoger from "./Logger/errorLoger.js";
-import config from "./config/index.js";
 import initializeSocketIO from "./socketIo.js";
+import config from "./config/index.js";
+import app from "../index..js";
 const server = createServer(app);
 export const io = initializeSocketIO(server);
 async function main() {

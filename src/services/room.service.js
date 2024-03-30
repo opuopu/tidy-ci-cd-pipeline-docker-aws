@@ -14,7 +14,6 @@ const inserRoomIntoDB = async (payload) => {
   try {
     session.startTransaction();
     const createHome = await Home.create([homeObj], { session });
-    console.log(createHome);
     if (!createHome[0]) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -61,7 +60,6 @@ const inserRoomIntoDB = async (payload) => {
   }
 };
 const getRoomsByQuery = async (query) => {
-  console.log(query);
   const roomQuery = new QueryBuilder(Room.find(), query)
     .search()
     .filter()

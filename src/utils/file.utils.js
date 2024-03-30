@@ -18,5 +18,5 @@ const deleteFile = async (path) => {
 export { deleteFile };
 export const createFileDetails = (folderName, filename) => {
   console.log(folderName, filename);
-  return `/public/uploads/${folderName}/${filename}`;
+  return `/uploads/${folderName}/${filename}`;
 };
