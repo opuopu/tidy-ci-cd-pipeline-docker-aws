@@ -6,7 +6,10 @@ import AdditionalTask from "../models/additionalTask.model.js";
 import UserGroceryList from "../models/userGroceryList.model.js";
 
 const getAllEmployees = async (query) => {
-  const EmployeeQuery = new QueryBuilder(Employee.find(), query)
+  const EmployeeQuery = new QueryBuilder(
+    Employee.find().populate("user"),
+    query
+  )
     .search()
     .filter()
     .paginate()
@@ -14,7 +17,6 @@ const getAllEmployees = async (query) => {
     .fields();
   const result = await EmployeeQuery.modelQuery;
   const meta = await EmployeeQuery.meta();
-
   return {
     result,
     meta,
