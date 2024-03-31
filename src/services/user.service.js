@@ -26,6 +26,7 @@ const getme = async (userId, role) => {
     homes: result?.homes,
     address: result?.address,
     reminder: result?.reminder,
+    access: result?.access,
     trial: result?.user?.trial,
     trialExpirationDate: result?.user?.trialExpirationDate,
     trialStatus: dateCompare(date, result?.user?.trialExpirationDate),
