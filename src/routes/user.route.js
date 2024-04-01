@@ -4,7 +4,6 @@ import { USER_ROLE } from "../constant/user.role.js";
 import userControllers from "../controllers/user.controller.js";
 import parseData from "../middlewares/parseData.js";
 import fileUpload from "../middlewares/fileUpload.js";
-
 const router = express.Router();
 const upload = fileUpload("./public/uploads/profile/");
 

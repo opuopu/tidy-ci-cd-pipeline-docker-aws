@@ -7,7 +7,7 @@ import authValidation from "../validation/auth.validation.js";
 import parseData from "../middlewares/parseData.js";
 import fileUpload from "../middlewares/fileUpload.js";
 const router = express.Router();
-const upload = fileUpload("./public/uploads/employee/");
+const upload = fileUpload("./public/uploads/profile/");
 router.post(
   "/homeOwner/signup",
   validateRequest(authValidation.signupHomeOwnerSchema),
