@@ -43,6 +43,7 @@ const createAnOtpIntoDB = async ({ email, type }) => {
   );
 };
 const veriFySignupOtp = async (payload) => {
+  console.log(payload);
   // check is exist otp
   const date = new Date();
   const isExistOtp = await Otp.findOne({
