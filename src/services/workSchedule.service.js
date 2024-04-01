@@ -57,7 +57,7 @@ const insertBreakTimeIntoDb = async (payload) => {
 
   const result = await WorkSchedule.create({
     ...payload,
-    task: "N/A",
+    task: "Break Time",
     type: "break",
   });
   return result;
