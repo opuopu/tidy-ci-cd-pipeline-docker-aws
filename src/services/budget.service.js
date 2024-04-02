@@ -80,8 +80,9 @@ const deleteBudget = async (id) => {
 };
 const budgetVsexpense = async (query) => {
   const { month, user } = query;
+  console.log(user);
   const userObjectId = new mongoose.Types.ObjectId(user);
-  const [year, monthValue] = month.split("-").map(Number);
+  const [year, monthValue] = month?.split("-").map(Number);
   const startDate = new Date(Date.UTC(year, monthValue - 1, 1));
   const endDate = new Date(Date.UTC(year, monthValue, 0));
   const result = await Budget.aggregate([

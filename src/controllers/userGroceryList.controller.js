@@ -49,7 +49,8 @@ const getuserSingleGroceryList = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "grocery List Retrived successfully",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 const findGroceryFromGroceryLists = catchAsync(async (req, res) => {

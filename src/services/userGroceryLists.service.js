@@ -39,14 +39,18 @@ const insertUserGroceryListsIntoDB = async (payload) => {
 };
 
 const findGroceryFromGroceryLists = async (query) => {
-  const goceryListModel = new QueryBuilder(UserGroceryList.find(), query)
+  const goceryListModel = new QueryBuilder(
+    UserGroceryList.find().populate("employee"),
+    query
+  )
     .search(["name"])
     .filter()
     .paginate()
     .fields()
     .sort();
   const result = await goceryListModel.modelQuery;
-  return result;
+  const meta = await UserListModel.meta();
+  return { result, meta };
 };
 
 const getgroceryListByEmployee = async (query) => {
