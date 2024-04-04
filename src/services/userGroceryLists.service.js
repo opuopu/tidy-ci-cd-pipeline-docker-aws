@@ -49,7 +49,7 @@ const findGroceryFromGroceryLists = async (query) => {
     .fields()
     .sort();
   const result = await goceryListModel.modelQuery;
-  const meta = await UserListModel.meta();
+  const meta = await goceryListModel.meta();
   return { result, meta };
 };
 

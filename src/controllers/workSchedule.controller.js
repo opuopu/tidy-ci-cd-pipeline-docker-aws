@@ -33,6 +33,16 @@ const getallWorkSchedules = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllWorkScheduleByRoom = catchAsync(async (req, res) => {
+  const result = await taskScheduleService.getAllWorkScheduleByRoom(req.query);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "work schedules retrived successfully",
+    data: result?.result,
+    meta: result?.meta,
+  });
+});
 const getSingleWorkSchedule = catchAsync(async (req, res) => {
   const result = await taskScheduleService.getsingleWorkSchedule(req.params.id);
   sendResponse(res, {
@@ -71,5 +81,6 @@ const taskScheduleController = {
   getSingleWorkSchedule,
   updateSchedule,
   deleteSingleSchedule,
+  getAllWorkScheduleByRoom,
 };
 export default taskScheduleController;

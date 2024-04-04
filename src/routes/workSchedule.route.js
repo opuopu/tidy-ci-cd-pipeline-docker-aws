@@ -21,6 +21,11 @@ router.get(
   taskScheduleController.getallWorkSchedules
 );
 router.get(
+  "/room",
+  auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
+  taskScheduleController.getAllWorkScheduleByRoom
+);
+router.get(
   "/:id",
   auth(USER_ROLE.HOMEOWNER, USER_ROLE.EMPLOYEE),
   taskScheduleController.getSingleWorkSchedule

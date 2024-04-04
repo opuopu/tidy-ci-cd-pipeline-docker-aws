@@ -96,12 +96,25 @@ const budgetVsexpense = async (query) => {
       },
     },
     {
+      $lookup: {
+        from: "budgetcategories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$category", // Unwind the category array
+    },
+    {
       $project: {
+        category: "$category.title", // Assuming name is the field you want to project from the Categories collection
         budgetAmount: "$amount",
         totalExpenseAmount: { $subtract: ["$amount", "$remainingAmount"] },
       },
     },
   ]);
+
   return result;
 };
 const budgetServices = {
