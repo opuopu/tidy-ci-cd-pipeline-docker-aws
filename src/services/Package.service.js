@@ -1,4 +1,4 @@
-import Packages from "../models/packages.model.js";
+import Packages from "../models/Packages.model.js";
 
 const insertPackageIntoDB = async (payload) => {
   const result = await Packages.create(payload);
