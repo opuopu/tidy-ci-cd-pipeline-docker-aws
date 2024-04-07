@@ -6,9 +6,6 @@ const signupHomeOwnerSchema = z.object({
       required_error: "Name is required",
     }),
     email: z.string().email({ required_error: "Email is required" }),
-    phoneNumber: z.string({
-      required_error: "Phone number is required",
-    }),
     password: z
       .string({
         required_error: "Password is required",

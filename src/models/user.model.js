@@ -5,9 +5,10 @@ import { calculateRemainingDays, dateCompare } from "../utils/date.utils.js";
 const userSchema = new Schema(
   {
     phoneNumber: {
-      type: Number,
+      type: String,
       // required: [true, "phone number is required"],
       // unique: true,
+      default: "",
     },
     email: {
       type: String,

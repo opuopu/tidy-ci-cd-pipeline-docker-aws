@@ -77,8 +77,9 @@ const deleteBudget = async (id) => {
 };
 const budgetVsexpense = async (query) => {
   const { month, user } = query;
+  console.log(user);
   const userObjectId = new mongoose.Types.ObjectId(user);
-  const [year, monthValue] = month.split("-").map(Number);
+  const [year, monthValue] = month?.split("-").map(Number);
   const startDate = new Date(Date.UTC(year, monthValue - 1, 1));
   const endDate = new Date(Date.UTC(year, monthValue, 0));
   const result = await Budget.aggregate([
@@ -92,12 +93,25 @@ const budgetVsexpense = async (query) => {
       },
     },
     {
+      $lookup: {
+        from: "budgetcategories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$category", // Unwind the category array
+    },
+    {
       $project: {
+        category: "$category.title", // Assuming name is the field you want to project from the Categories collection
         budgetAmount: "$amount",
         totalExpenseAmount: { $subtract: ["$amount", "$remainingAmount"] },
       },
     },
   ]);
+
   return result;
 };
 const budgetServices = {

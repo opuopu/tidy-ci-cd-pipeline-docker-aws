@@ -6,7 +6,7 @@ const router = express.Router();
 router.post("/resend-otp", otpControllers.createAnOtp);
 router.post(
   "/verify-signupOtp",
-  validateRequest(otpValidation.SignupOtpVerificationSchema),
+  // validateRequest(otpValidation.SignupOtpVerificationSchema),
   otpControllers.veriFySignupOtp
 );
 router.post(

@@ -6,6 +6,7 @@ import AssignSchedule from "../models/AssignWorkSchedule.model.js";
 
 import { TaskNotifcationMessage } from "../constant/notificationMessae.js";
 import notificationServices from "./notification.service.js";
+import QueryBuilder from "../builder/QueryBuilder.js";
 
 const insertUserTaskIntoDB = async (payload) => {
   const { schedule } = payload;
@@ -57,7 +58,7 @@ const insertBreakTimeIntoDb = async (payload) => {
 
   const result = await WorkSchedule.create({
     ...payload,
-    task: "N/A",
+    task: "Break Time",
     type: "break",
   });
   return result;
@@ -71,6 +72,24 @@ const getAllWorkSchedule = async (query) => {
   }
   const result = await WorkSchedule.find(query);
   return result;
+};
+
+const getAllWorkScheduleByRoom = async (query) => {
+  const workScheduleModel = new QueryBuilder(
+    WorkSchedule.find().populate({
+      path: "schedule",
+      populate: {
+        path: "employee",
+      },
+    }),
+    query
+  );
+  const result = await workScheduleModel.modelQuery;
+  const meta = await workScheduleModel.meta();
+  return {
+    result,
+    meta,
+  };
 };
 const getsingleWorkSchedule = async (id) => {
   const result = await WorkSchedule.findById(id);
@@ -129,5 +148,6 @@ const taskScheduleService = {
   finishSchedule,
   updateSchedule,
   deleteSingleSchedule,
+  getAllWorkScheduleByRoom,
 };
 export default taskScheduleService;

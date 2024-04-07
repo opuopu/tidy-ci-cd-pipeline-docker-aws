@@ -30,6 +30,7 @@ const homeOwnerSchema = new Schema(
     ],
     address: {
       type: String,
+      default: "",
     },
 
     package: {
