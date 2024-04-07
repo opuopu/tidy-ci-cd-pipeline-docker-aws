@@ -20,7 +20,7 @@ const signupEmployeeIntoDb = catchAsync(async (req, res) => {
   req.body.homeOwner = userId;
 
   if (req?.file) {
-    req.body.image = createFileDetails("employee", req?.file?.filename);
+    req.body.image = createFileDetails("profile", req?.file?.filename);
   }
 
   const result = await authServices.signupEmployeeIntoDb(req.body);

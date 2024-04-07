@@ -54,7 +54,6 @@ const getuserSingleGroceryList = catchAsync(async (req, res) => {
   });
 });
 const findGroceryFromGroceryLists = catchAsync(async (req, res) => {
-  console.log(req.body);
   const { userId } = req?.user;
   req.query.homeOwner = userId;
   const result = await userGroceryListServices.findGroceryFromGroceryLists(
@@ -64,7 +63,8 @@ const findGroceryFromGroceryLists = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "grocery Lists Retrived successfully",
-    data: result,
+    data: result?.result,
+    meta: result?.meta,
   });
 });
 
@@ -141,7 +141,6 @@ const sendBuyRequest = catchAsync(async (req, res) => {
   });
 });
 const acceptBuyRequest = catchAsync(async (req, res) => {
-  console.log("hitted");
   const result = await userGroceryListServices.AcceptBuyRequest(req.params.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,

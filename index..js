@@ -13,9 +13,10 @@ app.use(helmet());
 app.use(express.json());
 app.use(cors({ origin: ["*"] }));
 
-app.get("/", (req, res) => { 
+app.get("/", (req, res) => {
   res.send("wow server is working!!");
 });
+
 app.use("/api/v1", router);
 app.use(globalErrorHandler);
 app.use(ApiNotFound);

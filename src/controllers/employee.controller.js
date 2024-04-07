@@ -28,7 +28,7 @@ const getSingleEmployee = catchAsync(async (req, res) => {
 });
 const updateAnEmployee = catchAsync(async (req, res) => {
   if (req?.file) {
-    req.body.image = createFileDetails(req, "employee", req?.file?.filename);
+    req.body.image = createFileDetails(req, "profile", req?.file?.filename);
   }
   const result = await employeeServices.updateEmployee(req.params.id, req.body);
   sendResponse(res, {
