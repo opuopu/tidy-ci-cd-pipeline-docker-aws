@@ -18,7 +18,6 @@ const insertBudgetIntoDB = async (payload) => {
       "Budget Already Exist With This Category"
     );
   }
-
   payload.month = new Date(formatedDate);
   const result = await Budget.create(payload);
   return result;

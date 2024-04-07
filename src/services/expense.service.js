@@ -3,11 +3,10 @@ import Expense from "../models/expense.model.js";
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import Budget from "../models/budget.model.js";
-import dayjs from "dayjs";
 const InsertExpenseIntoDb = async (payload) => {
   const session = await mongoose.startSession();
   const findBudget = await Budget.findById(payload.budget);
-  if (findBudget?.progress === 100) {
+  if (findBudget?.progress === 1) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Budget progress is full. Please update amount."
@@ -29,12 +28,16 @@ const InsertExpenseIntoDb = async (payload) => {
     if (!result[0]) {
       throw new AppError(httpStatus.BAD_REQUEST, "failed to create expense");
     }
-
+    const progress = payload?.amount / findBudget?.amount;
+    const updatedProgress = Math.min(progress + findBudget.progress, 1);
     const updateBudget = await Budget.findByIdAndUpdate(
       payload.budget,
       {
+        $set: {
+          progress: updatedProgress,
+        },
         $inc: {
-          progress: (payload?.amount / findBudget?.amount) * 100,
+          progressPercentage: (payload?.amount / findBudget?.amount) * 100,
           remainingAmount: -payload?.amount,
         },
       },

@@ -31,6 +31,12 @@ const budgetSchema = new Schema(
     progress: {
       type: Number,
       default: 0,
+      max: 1,
+    },
+    progressPercentage: {
+      type: Number,
+      default: 0,
+      max: 100,
     },
   },
   {

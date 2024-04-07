@@ -1,20 +1,6 @@
-export const days = [
-  "Saturday",
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-];
+export const days = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
-export const SundayToThursday = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-];
+export const SundayToThursday = ["Sun", "Mon", "Tue", "Wed", "Thu"];
 
 export const defaultTimeRanges = [
   "07:00-07:59",
