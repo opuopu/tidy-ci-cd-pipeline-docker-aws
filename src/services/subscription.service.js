@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import config from "../config/index.js";
 import { calculateAmount } from "../utils/subscription.utils.js";
-import Packages from "../models/packages.model.js";
+
 import AppError from "../errors/AppError.js";
 import httpStatus from "http-status";
 import { nextMonth, nextYear } from "../utils/schedule.utils.js";
@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import Subscription from "../models/subscription.model.js";
 import { User } from "../models/user.model.js";
 import HomeOwner from "../models/homeOwner.model.js";
+import Packages from "../models/Packages.model.js";
 const createPaymentIntent = async (payload) => {
   const { amount } = payload;
   const paymentIntent = await stripe.paymentIntents.create({
