@@ -52,11 +52,30 @@ const employeeSchema = new Schema(
         type: String,
       },
     ],
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
+
   {
     timestamps: true,
   }
 );
+// filter out deleted documents
+employeeSchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+employeeSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+employeeSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
+});
 
 const Employee = model("Employee", employeeSchema);
 export default Employee;

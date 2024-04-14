@@ -136,10 +136,6 @@ const SigninHomeOwner = async (payload) => {
 // signi
 const SigninEmployee = async (payload) => {
   const { email, password } = payload;
-  console.log(email);
-  if (!email) {
-    throw new AppError(httpStatus.BAD_REQUEST, "please provide an email");
-  }
   const user = await User.isUserExist(email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
@@ -148,8 +144,8 @@ const SigninEmployee = async (payload) => {
     throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
   }
   const findEmployee = await Employee.findOne({ id: user?.id });
-  if (!findEmployee) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
+  if (findEmployee?.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, "your account is deleted!");
   }
   const { password: hasedPassword } = user;
   const isPasswordMatched = await User.isPasswordMatched(
