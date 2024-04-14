@@ -9,8 +9,8 @@ const AssignWorkScheduleSchema = new Schema(
       required: [true, "homeowner information is required"],
     },
     employee: {
-      type: Schema.Types.ObjectId,
-      ref: "Employee",
+      type: String,
+      // ref: "Employee",
       required: [true, "employee information is required"],
     },
     assignedDate: {

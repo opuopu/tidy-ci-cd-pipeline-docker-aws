@@ -179,12 +179,10 @@ const employeeWorkDetailsByScheduleId = async (id) => {
   return result;
 };
 const getScheduleDataByEmployee = async (id) => {
-  const employeeId = new Types.ObjectId(id);
-  console.log(employeeId);
   const result = await AssignSchedule.aggregate([
     {
       $match: {
-        employee: employeeId,
+        employee: id,
       },
     },
     {
