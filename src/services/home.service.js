@@ -38,7 +38,13 @@ const deleteHome = async (homeOwnerId, id) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    const deleteHome = await Home.findByIdAndDelete(id);
+    const deleteHome = await Home.findByIdAndUpdate(
+      id,
+      {
+        isDeleted: true,
+      },
+      { new: true }
+    );
     if (!deleteHome) {
       throw (
         (new AppError(httpStatus.METHOD_NOT_ALLOWED, "Failed To Delete Home"),
@@ -62,13 +68,13 @@ const deleteHome = async (homeOwnerId, id) => {
         "Failed To Delete Home.Please try again"
       );
     }
-    const deleteRoom = await Room.deleteMany({ home: id }, { session });
-    if (!deleteRoom.acknowledged) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "Failed To Delete Home.Please try again"
-      );
-    }
+    // const deleteRoom = await Room.updateMany({ home: id }, { session });
+    // if (!deleteRoom.acknowledged) {
+    //   throw new AppError(
+    //     httpStatus.BAD_REQUEST,
+    //     "Failed To Delete Home.Please try again"
+    //   );
+    // }
     await session.commitTransaction();
     await session.endSession();
     return deleteHome;

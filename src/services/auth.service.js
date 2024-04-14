@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import Employee from "../models/employee.model.js";
 import { generateNewEmployeeId } from "../utils/employee.utils.js";
 import HomeOwner from "../models/homeOwner.model.js";
+import sendEmail from "../utils/sendEmail.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -299,6 +300,18 @@ const resetPassword = async (id, payload) => {
   return result;
 };
 
+// send email after signup
+
+const sendEmailAndPassword = async (payload) => {
+  await sendEmail(
+    payload?.email,
+    "Your Tidy Bayti Gmail And Password",
+    "Your Gmail And Password Is:",
+    `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;"><p>Email: ${payload?.email}</p><p>Password: ${payload?.password}</p></div>
+  `
+  );
+};
+
 const authServices = {
   SigninHomeOwner,
   refreshToken,
@@ -307,5 +320,6 @@ const authServices = {
   signupHomeOwnerIntoDB,
   signupEmployeeIntoDb,
   SigninEmployee,
+  sendEmailAndPassword,
 };
 export default authServices;

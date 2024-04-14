@@ -68,6 +68,15 @@ const GetTotalGroceries = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const sendEmailAndPassword = catchAsync(async (req, res) => {
+  const result = await employeeServices.sendEmailAndPassword(req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "email sent  successfully",
+    data: result,
+  });
+});
 
 const employeeControllers = {
   getAllEmployees,
@@ -76,5 +85,6 @@ const employeeControllers = {
   deleteAnEmployee,
   AdditionalTask,
   GetTotalGroceries,
+  sendEmailAndPassword,
 };
 export default employeeControllers;

@@ -86,7 +86,11 @@ const updateRoom = async (id, payload) => {
   return result;
 };
 const deleteRoom = async (id) => {
-  const result = await Room.findByIdAndDelete(id);
+  const result = await Room.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
   return result;
 };
 

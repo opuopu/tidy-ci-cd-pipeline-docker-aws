@@ -30,6 +30,11 @@ router.get(
   auth(USER_ROLE.HOMEOWNER),
   employeeControllers.deleteAnEmployee
 );
+router.post(
+  "/send-email",
+  auth(USER_ROLE.HOMEOWNER),
+  employeeControllers.sendEmailAndPassword
+);
 
 const employeeRoutes = router;
 export default employeeRoutes;

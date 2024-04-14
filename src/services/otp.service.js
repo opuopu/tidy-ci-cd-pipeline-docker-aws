@@ -39,7 +39,15 @@ const createAnOtpIntoDB = async ({ email, type }) => {
     email,
     "Your One-Time Verification Code",
     "Your One-Time Verification Code",
-    otp
+    `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+      <h2 style="color: #3498db; text-align: center;">One-Time Verification Code</h2>
+      <p style="font-size: 16px;">Your one-time verification code is:</p>
+      <p style="font-size: 24px; font-weight: bold; color: #2ecc71; text-align: center;">${otp}</p>
+      <p style="font-size: 16px;">This code is valid for 1 hour.</p>
+      <p style="font-size: 14px; color: #888;">Please do not share this code with anyone for security reasons.</p>
+    </div>
+  `
   );
 };
 const veriFySignupOtp = async (payload) => {
