@@ -7,10 +7,11 @@ import { createToken, verifyToken } from "../utils/auth.utils.js";
 import config from "../config/index.js";
 import Otp from "../models/Otp.model.js";
 import bcrypt from "bcrypt";
-import Employee from "../models/employee.model.js";
+
 import { generateNewEmployeeId } from "../utils/employee.utils.js";
 import HomeOwner from "../models/homeOwner.model.js";
 import sendEmail from "../utils/sendEmail.js";
+import Employee from "../models/employee.model.js";
 // create homeOwner
 const signupHomeOwnerIntoDB = async (payload) => {
   const { email } = payload;
@@ -41,6 +42,7 @@ const signupEmployeeIntoDb = async (payload) => {
     needPasswordChange: true,
     role: "employee",
     verified: true,
+
     id: id,
   };
   const user = await User.isUserExist(email);
@@ -55,14 +57,16 @@ const signupEmployeeIntoDb = async (payload) => {
   try {
     session.startTransaction();
     result = await User.create([authObj], { session });
-    if (!result) {
+    if (!result[0]) {
       throw new AppError(httpStatus.BAD_REQUEST, "Somethign Went Wrong");
     }
+    const userId = result[0]?._id;
+
     const insertEmployeeDetails = await Employee.create(
       [
         {
           ...others,
-          user: result[0]?._id,
+          user: userId,
           id: id,
         },
       ],
@@ -140,11 +144,12 @@ const SigninEmployee = async (payload) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "user not exist with this email!");
   }
+  const findEmployee = await Employee.findOne({ id: user?.id });
   if (user?.role !== "employee") {
     throw new AppError(httpStatus.NOT_FOUND, "you are not authorized!");
   }
-  const findEmployee = await Employee.findOne({ id: user?.id });
-  if (findEmployee?.isDeleted) {
+
+  if (!findEmployee || findEmployee?.isDeleted) {
     throw new AppError(httpStatus.NOT_FOUND, "your account is deleted!");
   }
   const { password: hasedPassword } = user;
