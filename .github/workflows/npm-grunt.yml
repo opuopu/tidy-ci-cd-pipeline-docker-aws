@@ -1,28 +1,20 @@
-name: NodeJS with Grunt
+name: TidyBayti Docker Image
 
 on:
   push:
-    branches: [ "stage" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "stage" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    - name: Build
-      run: |
-        npm install
-        grunt
+      # Add steps for building and pushing the Docker image here
