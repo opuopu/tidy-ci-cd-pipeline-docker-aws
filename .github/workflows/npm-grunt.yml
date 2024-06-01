@@ -2,9 +2,9 @@ name: TidyBayti Docker Image
 
 on:
   push:
-    branches: ["main"]
+    branches: ["stage"]
   pull_request:
-    branches: ["main"]
+    branches: ["stage"]
 
 jobs:
   build:
